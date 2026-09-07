@@ -7,7 +7,7 @@ import java.util.Map;
  * @author jenic
  */
 public class TicketManager {
-    //hashmao to store data
+    //hashmap to store data
     private Map<Integer, Ticket> tickets = new HashMap<>();
     
     //assigning id's to new tickets

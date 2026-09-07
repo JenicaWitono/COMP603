@@ -3,9 +3,28 @@ import java.util.Scanner;
 
 /**
  *
- * @author jenic + J_DOG234
+ * @author jenic
  */
 public class Main {
+    //handling global commands
+    private static boolean handleGlobalCommands(String input, TicketManager manager) {
+        //back command - returns user to the main view
+        if (input.equalsIgnoreCase("back")) {
+            System.out.println("Returning to main menu...");
+            return true; // tells caller to stop what it's doing
+        }
+        
+        //exit command - save and exit the application
+        if (input.equalsIgnoreCase("exit")) {
+            System.out.println("Saving (placeholder)... and exiting.");
+            // manager.saveToJson("tickets.json");   // placeholder
+            System.exit(0);
+        }
+        
+        // no global command detected
+        return false; 
+    }
+
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         TicketManager manager = new TicketManager();
@@ -15,22 +34,48 @@ public class Main {
             System.out.println("> ");
             String input = scan.nextLine().trim();
             
-            if (input.equalsIgnoreCase("new")) {
-                createNewTicket (scan, manager);
+            //check for global command
+            if (handleGlobalCommands(input, manager)) {
+                continue;
             }
             
-            if (input.equalsIgnoreCase("exit")){
-                break;
+            if (input.equalsIgnoreCase("new")) {
+                createNewTicket (scan, manager);
+                continue;
             }
+            
+            System.out.println("Unknown command.");
         }
     }
     
     //creating a new ticket method
     public static void createNewTicket(Scanner scan, TicketManager manager) {
-        
-        Ticket ticket = TicketInput.userInput(scan, manager);
-        System.out.println("New ticket created (ID: " + ticket.getId() + ")");
-        System.out.println(ticket.toString());
-        
+        //prompts new task title
+        while (true){
+            System.out.println("Enter title of new task: ");
+            String input = scan.nextLine();
+
+            //check for global command
+            if (handleGlobalCommands(input, manager)) {
+                return;
+            }
+
+            //validating title
+            //no empty title
+            if (input.isEmpty()) {
+                System.out.println("Title cannot be empty.");
+                continue;
+            }
+            //max char limit is 50
+            if (input.length() > 100) {
+                System.out.println("Title cannot exceed 100 characters.");
+                continue;
+            }
+
+            Ticket t = manager.createTicket(input);
+            System.out.println("New ticket created (ID: " +t.getId()+")");
+            
+            return; //back to main menu
+        }
     }
 }
