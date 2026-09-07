@@ -57,7 +57,7 @@ public class TicketInput {
             } catch (DateTimeParseException e){
                 System.out.println("Invalid date format");
             }
-        }
+        }   
         
         System.out.println("Ticket created successfully!");
         return ticket;

@@ -48,34 +48,12 @@ public class Main {
         }
     }
     
-    //creating a new ticket method
+  //creating a new ticket method
     public static void createNewTicket(Scanner scan, TicketManager manager) {
-        //prompts new task title
-        while (true){
-            System.out.println("Enter title of new task: ");
-            String input = scan.nextLine();
-
-            //check for global command
-            if (handleGlobalCommands(input, manager)) {
-                return;
-            }
-
-            //validating title
-            //no empty title
-            if (input.isEmpty()) {
-                System.out.println("Title cannot be empty.");
-                continue;
-            }
-            //max char limit is 50
-            if (input.length() > 100) {
-                System.out.println("Title cannot exceed 100 characters.");
-                continue;
-            }
-
-            Ticket t = manager.createTicket(input);
-            System.out.println("New ticket created (ID: " +t.getId()+")");
-            
-            return; //back to main menu
-        }
+        
+        Ticket ticket = TicketInput.userInput(scan, manager);
+        System.out.println("New ticket created (ID: " + ticket.getId() + ")");
+        System.out.println(ticket.toString());
+        
     }
 }

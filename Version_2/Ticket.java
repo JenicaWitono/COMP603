@@ -40,26 +40,87 @@ public class Ticket {
         return duedate;
     }
     
+    public String getDescription(){
+        return description;
+    }
+    
+    public String getAssignee(){
+        return assignee;
+    }
+    
+    public Status getStatus(){
+        return status;
+    }
+    
     public LocalDate getLastModified(){
         return lastModified;
     }
     
      //title setter
     public void setTitle(String title) {
-        //makes sure nowhere ever is the title empty or past character limit
         //exception for empty titles
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be empty.");
         }
         //word limit exception
-        if (title.length() > 100) {
-            throw new IllegalArgumentException("Title limit is 100 characters.");
+        if (title.split("\\s+").length > 50) {
+            throw new IllegalArgumentException("Title limit is 50 words.");
         }
         this.title = title;
         updateLastModified();
     }
     
+    // Description set method
+    public void setDescription(String description){
+        this.description = description;
+        updateLastModified();
+    }
+    
+    // Assigne set method
+    public void setAssignee(String assignee){
+        this.assignee = assignee;
+        updateLastModified();
+    }
+    
+    // Status set method
+    public void setStatus(Status status){
+        this.status = status;
+        updateLastModified();
+    }
+    
+    // Priority set method
+    public void setPriority(Priority priority){
+        this.priority = priority;
+        updateLastModified();
+    }
+    
+    // Duedate set method
+    public void setDuedate(LocalDate duedate){
+        this.duedate = duedate;
+        updateLastModified();
+    }
+    
+    //
+    
     public void updateLastModified(){
         this.lastModified = LocalDate.now();
     }
+    
+    // output
+    @Override
+    public String toString(){
+        return"Ticket{" +
+                "id= " + id +
+                ", title= '" + title + '\'' +
+                ", description= '" + description + '\'' +
+                ", assignee= '" + assignee + '\'' +
+                ", status= " + status +
+                ", priority= " + priority +
+                ", duedate= " + duedate +
+                ", lastModified= " + lastModified +
+                '}';
+
+    }
+    
+    
 }
