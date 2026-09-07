@@ -10,10 +10,10 @@ public class Ticket {
     private String title;
     private String description;
     private String assignee;
-    private Status status;
+    private Status status; // ADD
     private LocalDate duedate;
     private LocalDate lastModified;
-    private List<Integer> dependencies;
+    private List<Integer> dependencies; // ADD
     private Priority priority;
     
     public Ticket(int id, String title) {

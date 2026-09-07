@@ -1,5 +1,7 @@
-
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,6 +19,14 @@ public class TicketManager {
         tickets.put(nextID, t);
         nextID++;
         return t;
+    }
+    
+    //returns all tickets as a list sorted by ID
+    //MainView and DetailedView will pull from here
+    public List<Ticket> getAllTickets(){
+        List<Ticket> list = new ArrayList<>(tickets.values());
+        list.sort(Comparator.comparing(Ticket::getId));
+        return list;
     }
     
 }
