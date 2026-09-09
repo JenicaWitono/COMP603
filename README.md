@@ -1,6 +1,7 @@
 # COMP603
 Logging system - COMP603 Project Assignment
 JUST A LITTLE UPDATE 9-09-2026 I HAVE CREATED THE REMOVE THINGY MABOB
+Update 9-09-2026 added a file save (upon exit) and load upon start
 
 <<<<<<< HEAD
 9+10 = 21
