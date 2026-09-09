@@ -54,6 +54,8 @@ public class ConsoleInput {
             case "/new" -> createNewTicket();
             case "/mainview" -> view();
             case "/help" -> help();
+            case "/remove" -> removeTicket();
+            case "/edit" -> EditTicket.edit(scanner, manager);
             default -> System.out.println("Unknown command: '" +command+ "'.type ' /help for some help.");
         }
     }
@@ -74,6 +76,33 @@ public class ConsoleInput {
 
    }
    
+   // Remove Ticket
+   private void removeTicket(){
+       System.out.println("Please enter the ID of ticket to be removed: ");
+       String idText = scanner.nextLine().trim();
+       
+       int id;
+       try { 
+           id = Integer.parseInt(idText);
+       } catch (NumberFormatException e){
+           System.out.println(""+idText+" Is not a valid ticket ID.");
+           return;
+       }
+       
+       boolean removed = manager.removeTicket(id);
+       if(removed){
+           System.out.println("Ticket #"+id+" Has been succsefully removed.");
+       }
+       else {
+           System.out.println("No ticket found with ID "+id+".");
+       }
+   }
+   
+   // ALlows the user to edit and already existing ticket
+   private void editTicket(){
+       
+   }
+   
    // outputs all commands that a user can use 
    // Plan to implement a menu where it asks what aera the user needs help in
    private void help(){
@@ -81,6 +110,7 @@ public class ConsoleInput {
                           Comands: 
                             /new          - create a new ticket
                             /MainView     - shows details for one ticket
+                            /remove       - deletes a ticket by ID
                           
                           """);
    }

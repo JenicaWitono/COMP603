@@ -1,6 +1,6 @@
 /**
  *
- * @author jenic
+ * @author jenic + the J_DOG
  */
 import java.time.LocalDate;
 import java.util.List;
@@ -16,6 +16,7 @@ public class Ticket {
     private List<Integer> dependencies; // ADD
     private Priority priority;
     
+    // Required fields for ticket object
     public Ticket(int id, String title) {
         this.id = id;
         this.title = title;
