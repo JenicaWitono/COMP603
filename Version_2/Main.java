@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 /**
  *
- * @author jenic
+ * @author jenic + THE ONE AND ONLY J_DOG
  */
 
 import java.util.Scanner;

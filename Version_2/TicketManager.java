@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  *
- * @author jenic
+ * @author jenic + THE INCREDIBLE JDOGTACULAR
  */
 public class TicketManager {
     //hashmap to store data
@@ -29,4 +29,13 @@ public class TicketManager {
         return list;
     }
     
+    // Removes a ticket by ID
+    public boolean removeTicket(int id){
+        return tickets.remove(id) != null;
+    }
+    
+    // Ticket lookup 
+    public Ticket getTicket(int id){
+        return tickets.get(id);
+    }
 }
