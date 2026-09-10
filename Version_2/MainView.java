@@ -50,6 +50,8 @@ public class MainView {
             case TODO: return "To-Do";
             case IN_PROGRESS: return "In Progress";
             case IN_REVIEW: return "In Review";
+            case CLOSED: return "Ticket closed";
+            case DONE: return "Ticket done";
             default: return status.toString();
         }
     }
