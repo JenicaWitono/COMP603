@@ -16,6 +16,7 @@ public class ConsoleInput {
     private final Scanner scanner;
     private final TicketManager manager;
     private boolean running;
+    private static final String SAVE_FILE = "tickets.txt";
     
     // Constructor
     public ConsoleInput(Scanner scanner, TicketManager manager){
@@ -26,6 +27,8 @@ public class ConsoleInput {
     
     // Main loop
     public void run(){
+        //load save file if exists
+        FileStorage.load(SAVE_FILE, manager);
         System.out.println("Ticket manager. Type 'help' to see commands.");
         
         while(running){
@@ -56,11 +59,31 @@ public class ConsoleInput {
             case "/help" -> help();
             case "/remove" -> removeTicket();
             case "/edit" -> EditTicket.edit(scanner, manager);
+            case "/exit" -> exit();
+            case "/reset" -> resetTickets();
             default -> System.out.println("Unknown command: '" +command+ "'.type ' /help for some help.");
         }
     }
     
+    //exit method
+    private void exit(){
+        FileStorage.save(SAVE_FILE, manager);
+        System.out.println("Tickets saved. Goodbye!");
+        running = false;
+    }
+    
+    // Wipes all tickets after confirming with the user
+    private void resetTickets(){
+        System.out.print("This will delete ALL tickets. Are you sure? (yes/no): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
 
+        if (confirm.equals("yes")) {
+            manager.reset();
+            System.out.println("All tickets have been wiped.");
+        } else {
+            System.out.println("Reset cancelled.");
+        }
+    }
     
     // creates a new ticket
    private void createNewTicket(){
