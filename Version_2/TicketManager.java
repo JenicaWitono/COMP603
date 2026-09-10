@@ -43,6 +43,11 @@ public class TicketManager {
         return tickets.remove(id) != null;
     }
     
+    public void reset(){
+        tickets.clear();
+        nextID = 1;
+    }
+    
     // Ticket lookup 
     public Ticket getTicket(int id){
         return tickets.get(id);
