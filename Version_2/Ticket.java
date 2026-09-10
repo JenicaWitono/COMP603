@@ -4,14 +4,13 @@
  */
 import java.time.LocalDate;
 import java.util.List;
-import java.util.ArrayList;
 
 public class Ticket {
     private int id;
     private String title;
     private String description;
     private String assignee;
-    private Status status;
+    private Status status; // ADD
     private LocalDate duedate;
     private LocalDate lastModified;
     private List<Integer> dependencies; // ADD
@@ -38,7 +37,6 @@ public class Ticket {
         this.duedate = duedate;
         this.lastModified = lastModified;
         this.priority = priority;
-        this.dependencies = new ArrayList<>();
     }
     
     public int getId(){
@@ -73,15 +71,9 @@ public class Ticket {
         return lastModified;
     }
     
-    // Dependencies
-   public List<Integer> getDependencies(){
-       // WHAT DOES THIS DO
-       if (dependencies == null){
-           dependencies = new ArrayList<>();
-       }
-       return dependencies;
-   }
-    
+    public List<Integer> getDependencies(){
+        return dependencies;
+    }
     
      //title setter
     public void setTitle(String title) {
@@ -96,18 +88,6 @@ public class Ticket {
         this.title = title;
         updateLastModified();
     }
-    
-    // adding a dependency 
-    public void addDependency(int ticketId){
-        // to handle the error of a ticket being dependent on itself
-        if (ticketId == this.id){
-            throw new IllegalArgumentException("A ticket cannot depend on itself");
-        }
-        if (!dependencies.contains(ticketId)){
-            dependencies.add(ticketId);
-            updateLastModified();
-        }
-    } 
     
     // Description set method
     public void setDescription(String description){
@@ -139,18 +119,12 @@ public class Ticket {
         updateLastModified();
     }
     
-    // Updates the last modified to the date of the day
+    //
     
     public void updateLastModified(){
         this.lastModified = LocalDate.now();
     }
     
-    // removing a dependency
-    public void removeDependency(int ticketID){
-        dependencies.remove(Integer.valueOf(ticketID));
-        updateLastModified();
-    }
-
     // output
     @Override
     public String toString(){

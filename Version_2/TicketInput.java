@@ -44,7 +44,6 @@ public class TicketInput {
             ticket.setStatus(status);
         }
         
-        
         // Priotty input optional as will deagult to MEDIUM if no answer
         Priority priority  = InputHelper.promptUntilValid(scanner,
                 "What Priorty Level Is This Ticket? (LOW, MEDIUM, HIGH): ",
@@ -52,23 +51,6 @@ public class TicketInput {
                 Priority::valueOf);
         if (priority != null){
             ticket.setPriority(priority);
-        }
-        
-        // Dependencies input optional
-        String depsInput = InputHelper.readLine(scanner, "Enter dependency ticketIDs, comma separated (optional): ");
-        if (!depsInput.isEmpty()){
-            for (String part : depsInput.split(",")){
-                try {
-                    int depId = Integer.parseInt(part.trim());
-                    if (manager.getTicket(depId) != null){
-                        ticket.addDependency(depId);
-                    } else {
-                        System.out.println("No ticket found with ID #"+depId+" - skipped.");
-                    }
-                } catch (NumberFormatException e){
-                    System.out.println("'"+part.trim()+"' is not a valid ID - skipped.");
-                }
-            }
         }
         
         

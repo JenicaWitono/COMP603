@@ -35,7 +35,7 @@ public class FileStorage {
     public static void load(String filepath, TicketManager manager) {
         Path path = Paths.get(filepath);
         if (!Files.exists(path)) {
-            return; // no save file yet, e.g. first run
+            return;
         }
 
         List<String> lines;
@@ -50,31 +50,66 @@ public class FileStorage {
         for (String line : lines) {
             if (line.isBlank()) {
                 if (!fields.isEmpty()) {
-                    manager.addLoadedTicket(buildTicket(fields));
+                    processBlock(fields, manager);
                     fields = new HashMap<>();
                 }
                 continue;
             }
             int colon = line.indexOf(':');
-            if (colon == -1) continue; // skip a malformed line rather than crash
+            if (colon == -1) continue;
             fields.put(line.substring(0, colon), line.substring(colon + 1));
         }
-        if (!fields.isEmpty()) { // in case the file doesn't end with a blank line
+        if (!fields.isEmpty()) {
+            processBlock(fields, manager);
+        }
+    }
+
+    // Tries to load one ticket block; if it fails, marks that ID (if recoverable) as corrupted
+    private static void processBlock(Map<String, String> fields, TicketManager manager) {
+        try {
             manager.addLoadedTicket(buildTicket(fields));
+        } catch (Exception e) {
+            int id = extractId(fields);
+            if (id >= 0) {
+                System.out.println("Warning: ticket #" + id + " is corrupted and could not be loaded (" + e.getMessage() + ").");
+                manager.markCorrupted(id);
+            } else {
+                System.out.println("Warning: a ticket block with no readable ID was skipped entirely.");
+            }
+        }
+    }
+
+    // Recovers just the ID from a broken block, separately from full parsing, so we can flag it
+    private static int extractId(Map<String, String> fields) {
+        try {
+            return Integer.parseInt(fields.get("ID"));
+        } catch (Exception e) {
+            return -1;
         }
     }
 
     private static Ticket buildTicket(Map<String, String> f) {
+        if (!f.containsKey("ID")) throw new IllegalStateException("missing ID");
         int id = Integer.parseInt(f.get("ID"));
+
         String title = f.get("Title");
+        if (title == null || title.isBlank()) throw new IllegalStateException("missing title");
+
         String description = emptyToNull(f.get("Description"));
         String assignee = emptyToNull(f.get("Assignee"));
+
+        if (!f.containsKey("Status")) throw new IllegalStateException("missing status");
         Status status = Status.valueOf(f.get("Status"));
+
+        if (!f.containsKey("Priority")) throw new IllegalStateException("missing priority");
         Priority priority = Priority.valueOf(f.get("Priority"));
+
         String dueStr = f.get("DueDate");
         LocalDate duedate = (dueStr == null || dueStr.isEmpty()) ? null : LocalDate.parse(dueStr);
+
         String lastModStr = f.get("LastModified");
         LocalDate lastModified = (lastModStr == null || lastModStr.isEmpty()) ? LocalDate.now() : LocalDate.parse(lastModStr);
+
         return new Ticket(id, title, description, assignee, status, duedate, lastModified, priority);
     }
 
