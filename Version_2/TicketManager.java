@@ -25,6 +25,20 @@ public class TicketManager {
         return t;
     }
     
+    // Returns true only if every dependency ticket is Done or Closed
+    public boolean areDependenciesComplete(Ticket ticket){
+        for (int depId : ticket.getDependencies()){
+            Ticket dep = tickets.get(depId);
+            if (dep == null){
+                continue; //
+            }
+            if (dep.getStatus() != Status.DONE && dep.getStatus() != Status.CLOSED){
+                return false;
+            }
+        }
+        return true;
+    }
+    
     //returns all tickets as a list sorted by ID
     //MainView and DetailedView will pull from here
     public List<Ticket> getAllTickets(){
