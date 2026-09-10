@@ -16,52 +16,62 @@ import java.util.Scanner;
 public class TicketInput {
     
     public static Ticket userInput(Scanner scanner, TicketManager manager){
-        
+        Ticket ticket = null;
+        try{ 
+      
         // Title is required for createTicket() for ticket constructor
-        System.out.print("Enter ticket title: ");
-        String title = scanner.nextLine();
-        
-        Ticket ticket = manager.createTicket(title);
+        String title = InputHelper.readLine(scanner, "Enter ticket title: ");
+        ticket = manager.createTicket(title);
         
         // Description input optional for user
-        System.out.println("Enter A Description of the ticket (optional): ");
-        String description = scanner.nextLine();
+        String description = InputHelper.readLine(scanner, "Enter A Description of the ticket (optional): ");
         if(!description.trim().isEmpty()){ // If the description is empty will skip instead of overrighting
             ticket.setDescription(description);
         }
         
         // Assignee input optional for user
-        System.out.println("Enter A Assignee (optional): ");
-        String assignee = scanner.nextLine();
-        if(!assignee.trim().isEmpty()){
+        String assignee = InputHelper.readLine(scanner, "Enter A Assignee (optional_: ");
+        if(!assignee.trim().isEmpty()){ // If the description is empty will skip instead of overrighting
             ticket.setAssignee(assignee);
         }
         
-        // Priotty input optional for now but would like to make it required latter
-        System.out.println("What Priorty Level Is This Ticket? (LOW, MEDIUM, HIGH): ");
-        String priorty = scanner.nextLine().trim().toUpperCase();
-        if(!priorty.isEmpty()){
-            try{
-                ticket.setPriority(Priority.valueOf(priorty));
-            }catch (IllegalArgumentException e){ // Only allows values stored in Piortiy enum to pass
-                System.out.println("Invalid priority entered");
-            }
+        // Status input optional as will defualt to TODO if no answer
+        Status status = InputHelper.promptUntilValid(scanner,
+                "What Status would you like this ticket to be at? (TODO, IN_PROGRESS, IN_REVIEW, DONE, CLOSED)",
+                true,
+                Status::valueOf);
+        if (status != null){
+            ticket.setStatus(status);
         }
         
-        // Duedate input optional for user
-        System.out.println("Enter due date (yyyy-mm-dd) (optional): "); // will change date input to dd/mm/yyyy but dont know how yet
-        String duedate = scanner.nextLine().trim();
-        if(!duedate.isEmpty()){
-            try{
-                ticket.setDuedate(LocalDate.parse(duedate));
-            } catch (DateTimeParseException e){
-                System.out.println("Invalid date format");
-            }
-        }   
+        // Priotty input optional as will deagult to MEDIUM if no answer
+        Priority priority  = InputHelper.promptUntilValid(scanner,
+                "What Priorty Level Is This Ticket? (LOW, MEDIUM, HIGH): ",
+                true,
+                Priority::valueOf);
+        if (priority != null){
+            ticket.setPriority(priority);
+        }
         
+        
+        // Duedate input optional for user
+        LocalDate duedate = InputHelper.promptUntilValid(scanner, 
+                "Enter due date (yyyy-mm-dd) (optional): ", // will change date input to dd/mm/yyyy but dont know how yet
+                true,
+                LocalDate::parse);
+        
+        if (duedate != null){
+            ticket.setDuedate(duedate);
+        }
+
         System.out.println("Ticket created successfully!");
         return ticket;
-                
+        } catch (InputHelper.BackException e){
+            if (ticket != null){
+                manager.removeTicket(ticket.getId());
+            }
+            System.out.println("Ticket creation cancelled.");
+            return null;
+        } 
     }
-  
 }

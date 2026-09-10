@@ -25,6 +25,7 @@ public class Ticket {
         this.priority = Priority.MEDIUM;
     }
     
+        
     // Used only when rebuilding a ticket from saved data — skips the "new ticket" defaults
     public Ticket(int id, String title, String description, String assignee, Status status,
                   LocalDate duedate, LocalDate lastModified, Priority priority) {

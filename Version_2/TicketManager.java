@@ -15,19 +15,10 @@ public class TicketManager {
     //assigning id's to new tickets
     private int nextID = 1;
     public Ticket createTicket(String title) {
-        Ticket t;
-        t = new Ticket(nextID, title);
+        Ticket t = new Ticket(nextID, title);
         tickets.put(nextID, t);
         nextID++;
         return t;
-    }
-    
-    // Inserts a ticket during load, preserving its saved ID, and keeps nextID ahead of it
-    public void addLoadedTicket(Ticket t){
-        tickets.put(t.getId(), t);
-        if (t.getId() >= nextID) {
-            nextID = t.getId() + 1;
-        }
     }
     
     //returns all tickets as a list sorted by ID
@@ -43,6 +34,15 @@ public class TicketManager {
         return tickets.remove(id) != null;
     }
     
+    // Inserts a ticket during load, preserving its saved ID, and keeps nextID ahead of it
+    public void addLoadedTicket(Ticket t){
+        tickets.put(t.getId(), t);
+        if (t.getId() >= nextID) {
+            nextID = t.getId() + 1;
+        }
+    }
+    
+    // Resets the save file tickets are stored in
     public void reset(){
         tickets.clear();
         nextID = 1;
