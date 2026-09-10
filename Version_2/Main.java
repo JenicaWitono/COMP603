@@ -16,3 +16,4 @@ public class Main {
         new ConsoleInput(scanner, manager).run();
     }
 }
+    

@@ -24,30 +24,29 @@ public class TicketInput {
         ticket = manager.createTicket(title);
         
         // Description input optional for user
-        String description = InputHelper.readLine(scanner, "Enter A Description of the ticket (optional): ");
+        String description = InputHelper.readLine(scanner, "Enter a Description of the ticket (optional): ");
         if(!description.trim().isEmpty()){ // If the description is empty will skip instead of overrighting
             ticket.setDescription(description);
         }
         
         // Assignee input optional for user
-        String assignee = InputHelper.readLine(scanner, "Enter A Assignee (optional_: ");
+        String assignee = InputHelper.readLine(scanner, "Enter an Assignee (optional): ");
         if(!assignee.trim().isEmpty()){ // If the description is empty will skip instead of overrighting
             ticket.setAssignee(assignee);
         }
         
         // Status input optional as will defualt to TODO if no answer
         Status status = InputHelper.promptUntilValid(scanner,
-                "What Status would you like this ticket to be at? (TODO, IN_PROGRESS, IN_REVIEW, DONE, CLOSED)",
+                "What is the Status of this Ticket? (TODO, IN_PROGRESS, IN_REVIEW, DONE, CLOSED): ",
                 true,
                 Status::valueOf);
         if (status != null){
             ticket.setStatus(status);
         }
         
-        
         // Priotty input optional as will deagult to MEDIUM if no answer
         Priority priority  = InputHelper.promptUntilValid(scanner,
-                "What Priorty Level Is This Ticket? (LOW, MEDIUM, HIGH): ",
+                "What Priorty Level is This Ticket? (LOW, MEDIUM, HIGH): ",
                 true,
                 Priority::valueOf);
         if (priority != null){
@@ -55,13 +54,14 @@ public class TicketInput {
         }
         
         // Dependencies input optional
-        String depsInput = InputHelper.readLine(scanner, "Enter dependency ticketIDs, comma separated (optional): ");
+        String depsInput = InputHelper.readLine(scanner, "Enter dependency ticket IDs, comma separated (optional): ");
         if (!depsInput.isEmpty()){
             for (String part : depsInput.split(",")){
                 try {
                     int depId = Integer.parseInt(part.trim());
                     if (manager.getTicket(depId) != null){
                         ticket.addDependency(depId);
+                        System.out.println("Added dependency on ticket #" + depId + ".");
                     } else {
                         System.out.println("No ticket found with ID #"+depId+" - skipped.");
                     }
@@ -70,7 +70,6 @@ public class TicketInput {
                 }
             }
         }
-        
         
         // Duedate input optional for user
         LocalDate duedate = InputHelper.promptUntilValid(scanner, 

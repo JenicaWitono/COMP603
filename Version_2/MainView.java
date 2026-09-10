@@ -6,10 +6,10 @@ import java.util.List;
  */
 public class MainView {
     
-    private static final String ROW_FORMAT = "%-8s%-30s%-12s%-10s%-10s%n";
+    private static final String ROW_FORMAT = "%-8s%-30s%-14s%-11s%-10s%n";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
     private static final int TITLE_CONTENT_WIDTH = 25; // max chars shown before "..."
-    private static final int ROW_WIDTH = 8 + 30 + 12 + 10 + 10; // keep in sync with ROW_FORMAT
+    private static final int ROW_WIDTH = 8 + 30 + 14 + 11 + 10; // keep in sync with ROW_FORMAT
     
     //truncate long titles to have "..." instead
     private static String truncateTitle(String title) {
@@ -50,8 +50,8 @@ public class MainView {
             case TODO: return "To-Do";
             case IN_PROGRESS: return "In Progress";
             case IN_REVIEW: return "In Review";
-            case CLOSED: return "Ticket closed";
-            case DONE: return "Ticket done";
+            case DONE: return "Done";
+            case CLOSED: return "Closed";
             default: return status.toString();
         }
     }

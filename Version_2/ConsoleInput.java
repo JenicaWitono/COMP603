@@ -65,6 +65,7 @@ public class ConsoleInput {
             case "/remove" -> RemoveTicket.removeTicket(scanner, manager);
             case "/edit" -> EditTicket.edit(scanner, manager);
             case "/reset" -> resetTickets();
+            case "/detailview" -> viewDetail();
             default -> System.out.println("Unknown command: '" +command+ "'.type ' /help for some help.");
         }
     }
@@ -81,13 +82,15 @@ public class ConsoleInput {
    
     // Wipes all tickets after confirming with the user
     private void resetTickets(){
-        System.out.print("This will delete ALL tickets. Are you sure? (yes/no): ");
-        String confirm = scanner.nextLine().trim().toLowerCase();
-
-        if (confirm.equals("yes")) {
-            manager.reset();
-            System.out.println("All tickets have been wiped.");
-        } else {
+        try {
+            String confirm = InputHelper.readLine(scanner, "This will delete ALL tickets. Are you sure? (yes/no): ").toLowerCase();
+            if (confirm.equals("yes")) {
+                manager.reset();
+                System.out.println("All tickets have been wiped.");
+            } else {
+                System.out.println("Reset cancelled.");
+            }
+        } catch (InputHelper.BackException e) {
             System.out.println("Reset cancelled.");
         }
     }
@@ -96,16 +99,45 @@ public class ConsoleInput {
    // Plan to implement a menu where it asks what aera the user needs help in
    private void help(){
        System.out.println("""
-                          Comands: 
-                            /new          - create a new ticket
-                            /MainView     - shows details for one ticket
-                            /remove       - deletes a ticket by ID
-                            /edit         - edit a already exisiting ticket
-                            /reset        - will clear the current save file and remove all tickets
+                          Commands: 
+                            /new          - Create a new ticket
+                            /mainview     - Shows a brief view of all tickets
+                            /detailview   - Shows details for one ticket
+                            /remove       - Deletes a ticket by ID
+                            /edit         - Edit a already exisiting ticket
+                            /reset        - Clear the current save file and remove all tickets
+                          The system saves upon quitting.
                           Type 'exit' any time to quit, 'back' to cancel the current action.    
                           """);
    }
-    
+   
+   //trigger view detail
+    private void viewDetail(){
+        try {
+            String idText = InputHelper.readLine(scanner, "Enter the ID of the ticket to view: ");
+            int id;
+
+            try {
+                id = Integer.parseInt(idText);
+            } catch (NumberFormatException e) {
+                System.out.println(idText + " is not a valid ticket ID.");
+                return;
+            }
+            
+            Ticket ticket = manager.getTicket(id);
+            if (ticket == null) {
+                System.out.println("No ticket found with ID " + id + ".");
+                return;
+            }
+            if (manager.isCorrupted(id)) {
+                    System.out.println("Ticket #" + id + " is corrupted and cannot be accessed.");
+                    return;
+            }
+            DetailView.print(ticket);
+        } catch (InputHelper.BackException e) {
+            System.out.println("Cancelled.");
+        }
+    }
     
     
     

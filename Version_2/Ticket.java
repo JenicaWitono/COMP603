@@ -11,7 +11,7 @@ public class Ticket {
     private String title;
     private String description;
     private String assignee;
-    private Status status;
+    private Status status; // ADD
     private LocalDate duedate;
     private LocalDate lastModified;
     private List<Integer> dependencies; // ADD
@@ -24,6 +24,7 @@ public class Ticket {
         this.status = Status.TODO;
         this.lastModified = LocalDate.now();
         this.priority = Priority.MEDIUM;
+        this.dependencies = new ArrayList<>();
     }
     
         
@@ -73,15 +74,13 @@ public class Ticket {
         return lastModified;
     }
     
-    // Dependencies
-   public List<Integer> getDependencies(){
+    public List<Integer> getDependencies(){
        // WHAT DOES THIS DO
        if (dependencies == null){
            dependencies = new ArrayList<>();
        }
        return dependencies;
    }
-    
     
      //title setter
     public void setTitle(String title) {
@@ -140,7 +139,6 @@ public class Ticket {
     }
     
     // Updates the last modified to the date of the day
-    
     public void updateLastModified(){
         this.lastModified = LocalDate.now();
     }
@@ -150,7 +148,7 @@ public class Ticket {
         dependencies.remove(Integer.valueOf(ticketID));
         updateLastModified();
     }
-
+    
     // output
     @Override
     public String toString(){

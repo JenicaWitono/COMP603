@@ -46,8 +46,8 @@ public class EditTicket {
                 case "4", "Status" -> editStatus(scanner, ticket, manager);
                 case "5", "Priority" -> editPriority(scanner, ticket);
                 case "6", "Due Date" -> editDuedate(scanner, ticket);
-                case "7", "dependencies" -> editDependencies(scanner, ticket, manager);
                 case "0", "Done editing" -> editing = false;
+                case "7", "dependencies" -> editDependencies(scanner, ticket, manager);
                 default -> System.out.println("Not a valid option.");
             }
         }
@@ -107,26 +107,24 @@ public class EditTicket {
         }
     }
     
-    // Edit status 
     private static void editStatus(Scanner scanner, Ticket ticket, TicketManager manager){
         try {
             Status status = InputHelper.promptUntilValid(scanner,
                     "New status (TODO, IN_PROGRESS, IN_REVIEW, DONE, CLOSED: ",
                     false,
                     s -> Status.valueOf(s.toUpperCase()));
-            
-            // Checks dependecies to see if it can be changed
-            if ((status == status.IN_PROGRESS || status == status.IN_REVIEW || status == status.DONE)
-                    && !manager.areDependenciesComplete(ticket)){
-                System.out.println("Cannot move this ticket to "+status+" - it has incomplete dependencies");
-                for (int depId : ticket.getDependencies()){
-                    Ticket dep = manager.getTicket(depId);
-                    if (dep != null && dep.getStatus() != Status.DONE && dep.getStatus() != Status.CLOSED){
-                        System.out.println(" #"+dep.getId()+" - "+dep.getTitle()+" ("+dep.getStatus()+")");
+                // Checks dependecies to see if it can be changed
+                if ((status == status.IN_PROGRESS || status == status.IN_REVIEW || status == status.DONE)
+                        && !manager.areDependenciesComplete(ticket)){
+                    System.out.println("Cannot move this ticket to "+status+" - it has incomplete dependencies");
+                    for (int depId : ticket.getDependencies()){
+                        Ticket dep = manager.getTicket(depId);
+                        if (dep != null && dep.getStatus() != Status.DONE && dep.getStatus() != Status.CLOSED){
+                            System.out.println(" #"+dep.getId()+" - "+dep.getTitle()+" ("+dep.getStatus()+")");
+                        }
                     }
+                    return; // Rejects the change
                 }
-                return; // Rejects the change
-            }
             ticket.setStatus(status);
         } catch (InputHelper.BackException e){
             System.out.println("Status edit cancelled.");
@@ -161,7 +159,7 @@ public class EditTicket {
         try {
             System.out.println("Current dependencies: "+ticket.getDependencies());
             String action = InputHelper.readLine(scanner, "Add or remove a dependency? (add/remove): ").toLowerCase();
-            
+
             String idText = InputHelper.readLine(scanner, "Enter ticket ID t o add as a dependency");
             int depId;
             try {
@@ -170,7 +168,7 @@ public class EditTicket {
                 System.out.println("Not a valid ID.");
                 return;
             }
-            
+
             switch (action){
                 case "add","/add" -> {
                     if (manager.getTicket(depId) == null){
@@ -180,15 +178,15 @@ public class EditTicket {
                     ticket.addDependency(depId);
                     System.out.println("Added dependency on ticket #"+depId+".");
                 }
-                
+
                 case "remove","/remove" -> {
                     ticket.removeDependency(depId);
                     System.out.println("Removed dependency on ticket #"+depId+".");
                 }
-                
+
                 default -> System.out.println("Please type 'add' or 'remove'.");
             }
-   
+
         } catch (IllegalArgumentException e){
             System.out.println(e.getMessage());
         } catch (InputHelper.BackException e){

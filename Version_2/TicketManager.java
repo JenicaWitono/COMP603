@@ -3,6 +3,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -11,7 +13,9 @@ import java.util.Map;
 public class TicketManager {
     //hashmap to store data
     private Map<Integer, Ticket> tickets = new HashMap<>();
-    
+    //for corruptedIDs
+    private Set<Integer> corruptedIds = new HashSet<>();
+
     //assigning id's to new tickets
     private int nextID = 1;
     public Ticket createTicket(String title) {
@@ -65,5 +69,18 @@ public class TicketManager {
     // Ticket lookup 
     public Ticket getTicket(int id){
         return tickets.get(id);
+    }
+
+    // Marks an ID as unusable due to a load failure, and keeps nextID ahead of it
+    public void markCorrupted(int id){
+        corruptedIds.add(id);
+        if (id >= nextID) {
+            nextID = id + 1;
+        }
+    }
+    
+    //checks if the ticket is corrupted.
+    public boolean isCorrupted(int id){
+        return corruptedIds.contains(id);
     }
 }
