@@ -75,7 +75,6 @@ public class Ticket {
     }
     
     public List<Integer> getDependencies(){
-       // WHAT DOES THIS DO
        if (dependencies == null){
            dependencies = new ArrayList<>();
        }
@@ -95,19 +94,7 @@ public class Ticket {
         this.title = title;
         updateLastModified();
     }
-    
-    // adding a dependency 
-    public void addDependency(int ticketId){
-        // to handle the error of a ticket being dependent on itself
-        if (ticketId == this.id){
-            throw new IllegalArgumentException("A ticket cannot depend on itself");
-        }
-        if (!dependencies.contains(ticketId)){
-            dependencies.add(ticketId);
-            updateLastModified();
-        }
-    } 
-    
+
     // Description set method
     public void setDescription(String description){
         this.description = description;
@@ -142,6 +129,18 @@ public class Ticket {
     public void updateLastModified(){
         this.lastModified = LocalDate.now();
     }
+    
+    // adding a dependency 
+    public void addDependency(int ticketId){
+        // to handle the error of a ticket being dependent on itself
+        if (ticketId == this.id){
+            throw new IllegalArgumentException("A ticket cannot depend on itself");
+        }
+        if (!dependencies.contains(ticketId)){
+            dependencies.add(ticketId);
+            updateLastModified();
+        }
+    } 
     
     // removing a dependency
     public void removeDependency(int ticketID){

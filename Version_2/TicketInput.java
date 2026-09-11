@@ -4,7 +4,6 @@
  */
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 
@@ -20,7 +19,7 @@ public class TicketInput {
         try{ 
       
         // Title is required for createTicket() for ticket constructor
-        String title = InputHelper.readLine(scanner, "Enter ticket title: ");
+        String title = InputHelper.promptUntilValid(scanner, "Enter ticket title: ", false, TicketInput::validateTitle);
         ticket = manager.createTicket(title);
         
         // Description input optional for user
@@ -67,6 +66,8 @@ public class TicketInput {
                     }
                 } catch (NumberFormatException e){
                     System.out.println("'"+part.trim()+"' is not a valid ID - skipped.");
+                } catch (IllegalArgumentException e){
+                    System.out.println(e.getMessage() + " - skipped.");
                 }
             }
         }
@@ -90,5 +91,16 @@ public class TicketInput {
             System.out.println("Ticket creation cancelled.");
             return null;
         } 
+    }
+    
+    // Validates a title before ticket creation — same rules as Ticket.setTitle()
+    private static String validateTitle(String input){
+        if (input == null || input.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be empty.");
+        }
+        if (input.split("\\s+").length > 50) {
+            throw new IllegalArgumentException("Title limit is 50 words.");
+        }
+        return input;
     }
 }

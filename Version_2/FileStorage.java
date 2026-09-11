@@ -1,7 +1,10 @@
+// Generated with assistance from Claude
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,25 +28,27 @@ public class FileStorage {
             sb.append("\n"); // blank line separates tickets
         }
 
-        try {
-            Files.writeString(Paths.get(filepath), sb.toString());
+        writeToFile(filepath, sb.toString());
+    }
+
+    // Writes a String out to disk using BufferedWriter/FileWriter
+    private static void writeToFile(String filepath, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
+            writer.write(content);
         } catch (IOException e) {
             System.out.println("Failed to save tickets: " + e.getMessage());
         }
     }
 
     public static void load(String filepath, TicketManager manager) {
-        Path path = Paths.get(filepath);
-        if (!Files.exists(path)) {
-            return;
+        File file = new File(filepath);
+        if (!file.exists()) {
+            return; // no save file yet, e.g. first run
         }
 
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(path);
-        } catch (IOException e) {
-            System.out.println("Failed to load tickets: " + e.getMessage());
-            return;
+        List<String> lines = readLinesFromFile(file);
+        if (lines == null) {
+            return; // read failed; message already printed
         }
 
         Map<String, String> fields = new HashMap<>();
@@ -64,6 +69,21 @@ public class FileStorage {
         }
     }
 
+    // Reads every line of a file into a List, using BufferedReader/FileReader
+    private static List<String> readLinesFromFile(File file) {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to load tickets: " + e.getMessage());
+            return null;
+        }
+        return lines;
+    }
+
     // Tries to load one ticket block; if it fails, marks that ID (if recoverable) as corrupted
     private static void processBlock(Map<String, String> fields, TicketManager manager) {
         try {
@@ -79,7 +99,6 @@ public class FileStorage {
         }
     }
 
-    // Recovers just the ID from a broken block, separately from full parsing, so we can flag it
     private static int extractId(Map<String, String> fields) {
         try {
             return Integer.parseInt(fields.get("ID"));
