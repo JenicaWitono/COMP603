@@ -110,7 +110,7 @@ public class EditTicket {
     private static void editStatus(Scanner scanner, Ticket ticket, TicketManager manager){
         try {
             Status status = InputHelper.promptUntilValid(scanner,
-                    "New status (TODO, IN_PROGRESS, IN_REVIEW, DONE, CLOSED: ",
+                    "New status (To Do, In Progress, In Review, Done, Closed): ",
                     false,
                     s -> Status.valueOf(s.toUpperCase()));
                 // Checks dependecies to see if it can be changed
@@ -134,7 +134,7 @@ public class EditTicket {
     private static void editPriority(Scanner scanner, Ticket ticket){
         try {
             Priority priority = InputHelper.promptUntilValid(scanner,
-                    "New priority (LOW, MEDIUM, HIGH); ",
+                    "New priority (Low, Medium, High): ",
                     false,
                     s -> Priority.valueOf(s.toUpperCase()));
             ticket.setPriority(priority);
@@ -146,7 +146,7 @@ public class EditTicket {
     private static void editDuedate(Scanner scanner, Ticket ticket){
         try {
             LocalDate duedate = InputHelper.promptUntilValid(scanner,
-                    "New due date (yyyy-mm-dd): ",
+                    "New due date (dd/mm/yyyy): ",
                     false,
                     LocalDate::parse);
             ticket.setDuedate(duedate);

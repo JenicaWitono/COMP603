@@ -1,38 +1,33 @@
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Prints the main ticket list view (CLI table).
- */
 public class MainView {
     
     private static final String ROW_FORMAT = "%-8s%-30s%-14s%-11s%-10s%n";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
-    private static final int TITLE_CONTENT_WIDTH = 25; // max chars shown before "..."
-    private static final int ROW_WIDTH = 8 + 30 + 14 + 11 + 10; // keep in sync with ROW_FORMAT
-    
-    //truncate long titles to have "..." instead
-    private static String truncateTitle(String title) {
-        if (title.length() <= TITLE_CONTENT_WIDTH) {
-            return title;
-        }
-        // Leave room for the "..." within the content width
-        return title.substring(0, TITLE_CONTENT_WIDTH - 3) + "...";
-    }
-    
+    private static final int TITLE_CONTENT_WIDTH = 25;
+    private static final int ROW_WIDTH = 8 + 30 + 14 + 11 + 10;
+
+    // Active tickets (excludes DONE/CLOSED) — your original main view
     public static void print(List<Ticket> tickets) {
+        printTable(filterActive(tickets), "Main View");
+    }
+
+    // Archived tickets (DONE/CLOSED only)
+    public static void printArchived(List<Ticket> tickets) {
+        printTable(filterArchived(tickets), "Archived Tickets");
+    }
+
+    private static void printTable(List<Ticket> tickets, String heading) {
+        System.out.println(centerText(heading, ROW_WIDTH));
         System.out.printf(ROW_FORMAT, "ID", "Name", "Status", "Priority", "Due Date");
         System.out.println("-".repeat(ROW_WIDTH));
-        
+
         for (Ticket t : tickets) {
-            // Don't show completed tickets in the main view
-            if (t.getStatus() == Status.DONE || t.getStatus() == Status.CLOSED) {
-                continue;
-            }
-            
             String id = String.format("%03d", t.getId());
             String due = (t.getDuedate() == null) ? "-N/A-" : t.getDuedate().format(DATE_FORMAT);
-            
+
             System.out.printf(ROW_FORMAT,
                     id,
                     truncateTitle(t.getTitle()),
@@ -40,11 +35,45 @@ public class MainView {
                     formatPriority(t.getPriority()),
                     due);
         }
-        
+
         System.out.println("-".repeat(ROW_WIDTH));
     }
-    
-    // Converts enum constants into the display style from the mockup
+
+    private static List<Ticket> filterActive(List<Ticket> tickets) {
+        List<Ticket> result = new ArrayList<>();
+        for (Ticket t : tickets) {
+            if (t.getStatus() != Status.DONE && t.getStatus() != Status.CLOSED) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    private static List<Ticket> filterArchived(List<Ticket> tickets) {
+        List<Ticket> result = new ArrayList<>();
+        for (Ticket t : tickets) {
+            if (t.getStatus() == Status.DONE || t.getStatus() == Status.CLOSED) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    private static String centerText(String text, int width) {
+        int totalPadding = width - text.length();
+        if (totalPadding <= 0) return text;
+        int left = totalPadding / 2;
+        int right = totalPadding - left;
+        return " ".repeat(left) + text + " ".repeat(right);
+    }
+
+    private static String truncateTitle(String title) {
+        if (title.length() <= TITLE_CONTENT_WIDTH) {
+            return title;
+        }
+        return title.substring(0, TITLE_CONTENT_WIDTH - 3) + "...";
+    }
+
     private static String formatStatus(Status status) {
         switch (status) {
             case TODO: return "To-Do";
@@ -55,7 +84,7 @@ public class MainView {
             default: return status.toString();
         }
     }
-    
+
     private static String formatPriority(Priority priority) {
         String s = priority.toString();
         return s.charAt(0) + s.substring(1).toLowerCase();

@@ -37,18 +37,18 @@ public class TicketInput {
         
         // Status input optional as will defualt to TODO if no answer
         Status status = InputHelper.promptUntilValid(scanner,
-                "What is the Status of this Ticket? (TODO, IN_PROGRESS, IN_REVIEW, DONE, CLOSED): ",
+                "What is the Status of this Ticket? (To Do, In Progress, In Review, Done, Closed): ",
                 true,
-                Status::valueOf);
+                Status::parse);   // was Status::valueOf
         if (status != null){
             ticket.setStatus(status);
         }
         
         // Priotty input optional as will deagult to MEDIUM if no answer
         Priority priority  = InputHelper.promptUntilValid(scanner,
-                "What Priorty Level is This Ticket? (LOW, MEDIUM, HIGH): ",
+                "What Priority Level is This Ticket? (Low, Medium, High): ",
                 true,
-                Priority::valueOf);
+                Priority::parse);   // was Priority::valueOf
         if (priority != null){
             ticket.setPriority(priority);
         }
@@ -73,9 +73,9 @@ public class TicketInput {
         
         // Duedate input optional for user
         LocalDate duedate = InputHelper.promptUntilValid(scanner, 
-                "Enter due date (yyyy-mm-dd) (optional): ", // will change date input to dd/mm/yyyy but dont know how yet
+                "Enter due date (dd/mm/yyyy) (optional): ",
                 true,
-                LocalDate::parse);
+                InputHelper::parseDate);   // was LocalDate::parse
         
         if (duedate != null){
             ticket.setDuedate(duedate);

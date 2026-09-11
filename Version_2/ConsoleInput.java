@@ -8,6 +8,8 @@
  * @author Jamie
  */
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleInput {
@@ -53,20 +55,46 @@ public class ConsoleInput {
     
     // Figuring out what command was typed
     private void dispatch(String line){
-        // Handles user input such as 'New ticket please' as new
         String[] parts = line.split("\\s+", 2);
         String command = parts[0].toLowerCase();
-        
-        // Comands (more to come)
+        String rest = parts.length > 1 ? parts[1].trim().toLowerCase() : "";
+
         switch(command){
             case "/new" -> createNewTicket();
-            case "/mainview" -> MainView.print(manager.getAllTickets());
+            case "/view" -> viewMain(rest);
+            case "/archiveview" -> viewArchive(rest);
             case "/help" -> help();
             case "/remove" -> RemoveTicket.removeTicket(scanner, manager);
             case "/edit" -> EditTicket.edit(scanner, manager);
             case "/reset" -> resetTickets();
             case "/detailview" -> viewDetail();
             default -> System.out.println("Unknown command: '" +command+ "'.type ' /help for some help.");
+        }
+    }
+
+    private void viewMain(String sortBy){
+        List<Ticket> tickets = manager.getAllTickets();
+        tickets.sort(getComparator(sortBy));
+        MainView.print(tickets);
+    }
+
+    private void viewArchive(String sortBy){
+        List<Ticket> tickets = manager.getAllTickets();
+        tickets.sort(getComparator(sortBy));
+        MainView.printArchived(tickets);
+    }
+
+    // Maps a sort keyword to a comparator; defaults to ID order if unrecognized/blank
+    private Comparator<Ticket> getComparator(String sortBy){
+        switch (sortBy) {
+            case "priority":
+                return Comparator.comparing(Ticket::getPriority).reversed(); // HIGH first
+            case "status":
+                return Comparator.comparing(Ticket::getStatus);
+            case "duedate":
+                return Comparator.comparing(Ticket::getDuedate, Comparator.nullsLast(Comparator.naturalOrder()));
+            default:
+                return Comparator.comparing(Ticket::getId);
         }
     }
    
@@ -98,18 +126,21 @@ public class ConsoleInput {
    // outputs all commands that a user can use 
    // Plan to implement a menu where it asks what aera the user needs help in
    private void help(){
-       System.out.println("""
-                          Commands: 
-                            /new          - Create a new ticket
-                            /mainview     - Shows a brief view of all tickets
-                            /detailview   - Shows details for one ticket
-                            /remove       - Deletes a ticket by ID
-                            /edit         - Edit a already exisiting ticket
-                            /reset        - Clear the current save file and remove all tickets
-                          The system saves upon quitting.
-                          Type 'exit' any time to quit, 'back' to cancel the current action.    
-                          """);
-   }
+        System.out.println("""
+                           Commands: 
+                             /new                                      - Create a new ticket
+                             /view                                     - Shows active tickets
+                             /view [id|priority|status|duedate]        - Shows active tickets and sort based on the added field
+                             /archiveview                              - Shows completed/closed tickets
+                             /archiveview [id|priority|status|duedate] - Sort completed/closed tickets and sort based on the added field
+                             /detailview                               - Shows details for one ticket
+                             /remove                                   - Deletes a ticket by ID
+                             /edit                                     - Edit an already existing ticket
+                             /reset                                    - Clear the current save file and remove all tickets
+                           The system saves upon quitting.
+                           Type 'exit' any time to quit, 'back' to cancel the current action.    
+                           """);
+    }
    
    //trigger view detail
     private void viewDetail(){
