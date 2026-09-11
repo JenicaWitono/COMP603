@@ -1,6 +1,3 @@
-
-import java.util.Scanner;
-
 /**
  *
  * @author jenic + THE ONE AND ONLY J_DOG

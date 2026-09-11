@@ -42,12 +42,12 @@ public class EditTicket {
             switch(choice){
                 case "1", "title" -> editTitle(scanner, ticket);
                 case "2", "description" -> editDescription(scanner, ticket);
-                case "3", "Assigne" -> editAssigne(scanner, ticket);
-                case "4", "Status" -> editStatus(scanner, ticket, manager);
-                case "5", "Priority" -> editPriority(scanner, ticket);
-                case "6", "Due Date" -> editDuedate(scanner, ticket);
-                case "0", "Done editing" -> editing = false;
+                case "3", "assignee" -> editAssigne(scanner, ticket);
+                case "4", "status" -> editStatus(scanner, ticket, manager);
+                case "5", "priority" -> editPriority(scanner, ticket);
+                case "6", "due date" -> editDuedate(scanner, ticket);
                 case "7", "dependencies" -> editDependencies(scanner, ticket, manager);
+                case "0", "done editing" -> editing = false;
                 default -> System.out.println("Not a valid option.");
             }
         }
@@ -61,7 +61,7 @@ public class EditTicket {
         try{
             Ticket ticket = null;
             while (ticket == null){
-                String idText = InputHelper.readLine(scanner, "Enter the ID of the ticket you want to edit:  ");
+                String idText = InputHelper.readLine(scanner, "Enter the ID of the ticket you want to edit: ");
                 int id;
                 try{
                     id = Integer.parseInt(idText);
@@ -69,9 +69,13 @@ public class EditTicket {
                     System.out.println("That is not a valid ID number. Please try again.");
                     continue;
                 }
+                if (manager.isCorrupted(id)) {
+                    System.out.println("Ticket #" + id + " is corrupted and cannot be edited.");
+                    return null;
+                }
                 ticket = manager.getTicket(id);
                 if (ticket == null){
-                    System.out.println("No ticket found with #"+id+".Please try again.");
+                    System.out.println("No ticket found with #"+id+". Please try again.");
                 }
             }
             return ticket;
@@ -114,7 +118,7 @@ public class EditTicket {
                     false,
                     s -> Status.valueOf(s.toUpperCase()));
                 // Checks dependecies to see if it can be changed
-                if ((status == status.IN_PROGRESS || status == status.IN_REVIEW || status == status.DONE)
+                if ((status == Status.IN_PROGRESS || status == Status.IN_REVIEW || status == Status.DONE)
                         && !manager.areDependenciesComplete(ticket)){
                     System.out.println("Cannot move this ticket to "+status+" - it has incomplete dependencies");
                     for (int depId : ticket.getDependencies()){
