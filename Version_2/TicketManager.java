@@ -1,3 +1,5 @@
+//written with assistance from Claude.ai
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -6,18 +8,16 @@ import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- *
- * @author jenic + THE INCREDIBLE JDOGTACULAR
- */
+// Holds and manages all tickets in memory
 public class TicketManager {
     //hashmap to store data
     private Map<Integer, Ticket> tickets = new HashMap<>();
-    //for corruptedIDs
+    //for corruptedIDs that failed to load will be treated as inaccessible
     private Set<Integer> corruptedIds = new HashSet<>();
 
     //assigning id's to new tickets
     private int nextID = 1;
+    // creates and stores a new ticket. Auto assigns id based on nextID
     public Ticket createTicket(String title) {
         Ticket t = new Ticket(nextID, title);
         tickets.put(nextID, t);
@@ -30,7 +30,7 @@ public class TicketManager {
         for (int depId : ticket.getDependencies()){
             Ticket dep = tickets.get(depId);
             if (dep == null){
-                continue; //
+                continue; // missing dependency ticket, skips
             }
             if (dep.getStatus() != Status.DONE && dep.getStatus() != Status.CLOSED){
                 return false;
@@ -47,7 +47,7 @@ public class TicketManager {
         return list;
     }
     
-    // Removes a ticket by ID
+    // Removes a ticket by ID and will return whether or not it existed
     public boolean removeTicket(int id){
         return tickets.remove(id) != null;
     }
@@ -60,13 +60,13 @@ public class TicketManager {
         }
     }
     
-    // Resets the save file tickets are stored in
+   // Clears all tickets and resets ID counter
     public void reset(){
         tickets.clear();
         nextID = 1;
     }
     
-    // Ticket lookup 
+    // Ticket lookup, looks up by ID 
     public Ticket getTicket(int id){
         return tickets.get(id);
     }
@@ -79,7 +79,7 @@ public class TicketManager {
         }
     }
     
-    //checks if the ticket is corrupted.
+    //checks if the ticket is corrupted (by ID).
     public boolean isCorrupted(int id){
         return corruptedIds.contains(id);
     }

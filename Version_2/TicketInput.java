@@ -1,19 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
+//written with assistance from Claude.ai
 import java.time.LocalDate;
 import java.util.Scanner;
-
-
-
-/**
- *
- * @author Jamie
- */
 public class TicketInput {
     
+    // Walks the user through creating a new ticket, field by field
     public static Ticket userInput(Scanner scanner, TicketManager manager){
         Ticket ticket = null;
         try{ 
@@ -38,21 +28,21 @@ public class TicketInput {
         Status status = InputHelper.promptUntilValid(scanner,
                 "What is the Status of this Ticket? (To Do, In Progress, In Review, Done, Closed): ",
                 true,
-                Status::parse);   // was Status::valueOf
+                Status::parse); 
         if (status != null){
             ticket.setStatus(status);
         }
         
-        // Priotty input optional as will deagult to MEDIUM if no answer
+        // Priority input optional as will deagult to MEDIUM if no answer
         Priority priority  = InputHelper.promptUntilValid(scanner,
                 "What Priority Level is This Ticket? (Low, Medium, High): ",
                 true,
-                Priority::parse);   // was Priority::valueOf
+                Priority::parse);
         if (priority != null){
             ticket.setPriority(priority);
         }
         
-        // Dependencies input optional
+        // Dependencies are optional, comma separated list of ticket IDs
         String depsInput = InputHelper.readLine(scanner, "Enter dependency ticket IDs, comma separated (optional): ");
         if (!depsInput.isEmpty()){
             for (String part : depsInput.split(",")){
@@ -85,6 +75,7 @@ public class TicketInput {
         System.out.println("Ticket created successfully!");
         return ticket;
         } catch (InputHelper.BackException e){
+            // User backed out mid-creation, undo the partial ticket
             if (ticket != null){
                 manager.removeTicket(ticket.getId());
             }

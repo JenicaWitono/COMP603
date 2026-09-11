@@ -1,4 +1,4 @@
-// Generated with assistance from Claude
+//written with assistance from Claude.ai
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -6,12 +6,12 @@ public class DetailView extends AbstractTicketView {
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final int LABEL_WIDTH = 13; // length of "Last modified", the longest label
-    // ROW_WIDTH is inherited from AbstractTicketView — kept matched with MainView's ROW_FORMAT
 
     private static String formatLabel(String label) {
         return String.format("%-" + LABEL_WIDTH + "s : ", label);
     }
 
+    //prints all the details of a ticket
     public static void print(Ticket t) {
         System.out.println("-".repeat(ROW_WIDTH));
         System.out.println(centerText("Detailed View", ROW_WIDTH));
@@ -31,20 +31,20 @@ public class DetailView extends AbstractTicketView {
         System.out.println(formatLabel("Last modified") + t.getLastModified().format(DATE_FORMAT));
         System.out.println("-".repeat(ROW_WIDTH));
     }
-
+    //printing description to match the table
     private static void printDescription(String text) {
         String label = formatLabel("Description");
         int indent = label.length();
         int contentWidth = ROW_WIDTH - indent;
-
+        //should print -N/A- if empty
         if (text == null || text.isBlank()) {
             System.out.println(label + "-N/A-");
             return;
         }
-
+        
+        //description formatting so it doesn't wrap around the field name
         StringBuilder line = new StringBuilder();
         boolean firstLine = true;
-
         for (String word : text.split("\\s+")) {
             if (line.length() + word.length() + 1 > contentWidth) {
                 printDescLine(label, indent, line.toString(), firstLine);
@@ -58,7 +58,7 @@ public class DetailView extends AbstractTicketView {
             printDescLine(label, indent, line.toString(), firstLine);
         }
     }
-
+    //printing the formatted description
     private static void printDescLine(String label, int indent, String content, boolean first) {
         if (first) {
             System.out.println(label + content);
@@ -66,7 +66,7 @@ public class DetailView extends AbstractTicketView {
             System.out.println(" ".repeat(indent) + content);
         }
     }
-
+    //formatting dependencies to print -N/A- if empty
     private static String formatDependencies(List<Integer> deps) {
         if (deps == null || deps.isEmpty()) return "-N/A-";
         StringBuilder sb = new StringBuilder();

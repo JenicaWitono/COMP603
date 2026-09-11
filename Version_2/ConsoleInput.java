@@ -1,4 +1,4 @@
-
+//written with assistance from Claude.ai
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
@@ -18,9 +18,9 @@ public class ConsoleInput {
         this.running = true;
     }
     
-    // Main loop
+    // Loads saved tickets, then loops reading and dispatching commands until exit
     public void run(){
-        System.out.println("Ticket manager. Type 'help' to see commands.");
+        System.out.println("Welcome to Ticket Manager, home to all your tasks!\nUse '/new' to create a new ticket, or '/view' to view all your tickets.\nOtherwise, type '/help' to see all commands.");
         FileStorage.load(SAVE_FILE, manager);
         
         while(running){
@@ -33,10 +33,12 @@ public class ConsoleInput {
           
                 dispatch(line);
             } catch (InputHelper.ExitException e){
+                // Save on exit
                 System.out.println("File saved. Goodbye!");
                 FileStorage.save(SAVE_FILE, manager);
                 running = false;
             } catch (InputHelper.BackException e){
+                // Nothing to go back to from the main menu
                 System.out.println("You are at the main menu. Cannot go back anyfuther!");
             }
         }
@@ -82,14 +84,14 @@ public class ConsoleInput {
                            """);
     }
     
-    // creates a new ticket
+    // Runs the ticket creation and prints the result
     private void createNewTicket(){
        Ticket ticket = TicketInput.userInput(scanner, manager);
        if (ticket == null) {
            return; // for when user types 'back' mid-creation
        }
         System.out.println("New ticket created (ID: " + ticket.getId() + ")");
-        System.out.println(ticket.toString());
+        DetailView.print(ticket); 
    }
     
     //main/list view

@@ -1,15 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
+//written with assistance from Claude.ai
 public abstract class AbstractTicketView {
 
     // Shared row width used by both the table view and the detail view,
     // so their border widths always stay in sync
     protected static final int ROW_WIDTH = 8 + 30 + 14 + 11 + 10;
 
-    // Converts a Status into the display label used across all views
+    // Converts a Status into the display label
     protected static String formatStatus(Status status) {
         switch (status) {
             case TODO: return "To-Do";
@@ -21,13 +17,13 @@ public abstract class AbstractTicketView {
         }
     }
 
-    // Converts a Priority into the display label used across all views
+    // Converts a Priority into the display label
     protected static String formatPriority(Priority priority) {
         String s = priority.toString();
         return s.charAt(0) + s.substring(1).toLowerCase();
     }
 
-    // Centers text within a given width by padding both sides with spaces
+    // Centers text by padding both sides with spaces
     protected static String centerText(String text, int width) {
         int totalPadding = width - text.length();
         if (totalPadding <= 0) return text;

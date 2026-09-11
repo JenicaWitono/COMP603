@@ -1,24 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-/**
- *
- * @author asuka
- */
-
+//written with assistance from Claude.ai
 import java.util.Scanner;
 import java.util.function.Function;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-
+// Shared helpers for reading console input and handling exit/back commands
 public class InputHelper {
     
+    // Thrown when the user wants to quit the program
     public static class ExitException extends RuntimeException {}
+    // Thrown when the user wants to cancel the current action
     public static class BackException extends RuntimeException {}
     
+    // Reads line, and will thorw and exit or back on matching keywords otherwise will return the input
     public static String readLine(Scanner scanner, String prompt){
         System.out.print(prompt);
         String input = scanner.nextLine().trim();

@@ -1,6 +1,6 @@
 /**
  *
- * @author jenic + THE ONE AND ONLY J_DOG
+ * @author jenica + jamie
  */
 
 import java.util.Scanner;

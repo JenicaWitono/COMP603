@@ -1,4 +1,4 @@
-// Generated with assistance from Claude
+//written with assistance from Claude.ai
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;

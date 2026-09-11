@@ -1,23 +1,21 @@
-/**
- *
- * @author jenic + the J_DOG
- */
+//written with assistance from Claude.ai
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
 
+// Represents a single ticket and its data
 public class Ticket {
     private int id;
     private String title;
     private String description;
     private String assignee;
-    private Status status; // ADD
+    private Status status;
     private LocalDate duedate;
     private LocalDate lastModified;
-    private List<Integer> dependencies; // ADD
+    private List<Integer> dependencies;
     private Priority priority;
     
-    // Required fields for ticket object
+    // Constructor for creating a brand new ticket (applies defualts)
     public Ticket(int id, String title) {
         this.id = id;
         this.title = title;
@@ -28,7 +26,7 @@ public class Ticket {
     }
     
         
-    // Used only when rebuilding a ticket from saved data — skips the "new ticket" defaults
+    // Constructor for rebuilding a ticket from saved data (no defaults applied)
     public Ticket(int id, String title, String description, String assignee, Status status,
                   LocalDate duedate, LocalDate lastModified, Priority priority) {
         this.id = id;
@@ -81,13 +79,13 @@ public class Ticket {
        return dependencies;
    }
     
-     //title setter
+    // title setter with a validatoin
     public void setTitle(String title) {
         //exception for empty titles
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be empty.");
         }
-        //word limit exception
+        //word limit exception (50)
         if (title.split("\\s+").length > 50) {
             throw new IllegalArgumentException("Title limit is 50 words.");
         }
@@ -125,6 +123,11 @@ public class Ticket {
         updateLastModified();
     }
     
+    // Used by FileStorage when reconstructing a ticket's dependency list from saved data
+    public void setDependencies(List<Integer> dependencies){
+        this.dependencies = (dependencies != null) ? dependencies : new ArrayList<>();
+    }
+    
     // Updates the last modified to the date of the day
     public void updateLastModified(){
         this.lastModified = LocalDate.now();
@@ -142,13 +145,13 @@ public class Ticket {
         }
     } 
     
-    // removing a dependency
+    // removing a dependency by ID
     public void removeDependency(int ticketID){
         dependencies.remove(Integer.valueOf(ticketID));
         updateLastModified();
     }
     
-    // output
+    // Debug/ summary string for a ticket (used only in testing)
     @Override
     public String toString(){
         return"Ticket{" +

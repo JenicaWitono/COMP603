@@ -1,4 +1,4 @@
-// Generated with assistance from Claude
+//written with assistance from Claude.ai
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,13 +25,14 @@ public class FileStorage {
             sb.append("Priority:").append(t.getPriority()).append("\n");
             sb.append("DueDate:").append(t.getDuedate() == null ? "" : t.getDuedate()).append("\n");
             sb.append("LastModified:").append(t.getLastModified()).append("\n");
+            sb.append("Dependencies:").append(formatDependencies(t.getDependencies())).append("\n");
             sb.append("\n"); // blank line separates tickets
         }
 
         writeToFile(filepath, sb.toString());
     }
 
-    // Writes a String out to disk using BufferedWriter/FileWriter
+    // Writes the string using BufferedWriter/FileWriter
     private static void writeToFile(String filepath, String content) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
             writer.write(content);
@@ -39,16 +40,17 @@ public class FileStorage {
             System.out.println("Failed to save tickets: " + e.getMessage());
         }
     }
-
+    
+    //rebuilds the ticket from a savefile
     public static void load(String filepath, TicketManager manager) {
         File file = new File(filepath);
         if (!file.exists()) {
-            return; // no save file yet, e.g. first run
+            return; // no save file yet, skip method.
         }
 
         List<String> lines = readLinesFromFile(file);
         if (lines == null) {
-            return; // read failed; message already printed
+            return; // read failed
         }
 
         Map<String, String> fields = new HashMap<>();
@@ -98,13 +100,25 @@ public class FileStorage {
             }
         }
     }
-
+    
+    // Tries to recover ID of corrupted ticket
     private static int extractId(Map<String, String> fields) {
         try {
             return Integer.parseInt(fields.get("ID"));
         } catch (Exception e) {
             return -1;
         }
+    }
+    
+    //dependency helper
+    private static String formatDependencies(List<Integer> deps) {
+        if (deps == null || deps.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < deps.size(); i++) {
+            if (i > 0) sb.append(",");
+            sb.append(deps.get(i));
+        }
+        return sb.toString();
     }
 
     private static Ticket buildTicket(Map<String, String> f) {
@@ -129,7 +143,18 @@ public class FileStorage {
         String lastModStr = f.get("LastModified");
         LocalDate lastModified = (lastModStr == null || lastModStr.isEmpty()) ? LocalDate.now() : LocalDate.parse(lastModStr);
 
-        return new Ticket(id, title, description, assignee, status, duedate, lastModified, priority);
+        Ticket t = new Ticket(id, title, description, assignee, status, duedate, lastModified, priority);
+        t.setDependencies(parseDependencies(f.get("Dependencies")));
+        return t;
+    }
+
+    private static List<Integer> parseDependencies(String s) {
+        List<Integer> list = new ArrayList<>();
+        if (s == null || s.isEmpty()) return list;
+        for (String part : s.split(",")) {
+            list.add(Integer.parseInt(part.trim()));
+        }
+        return list;
     }
 
     private static String nullToEmpty(String s) {

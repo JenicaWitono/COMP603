@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author Jamie
- */
+//written with assistance from Claude.ai
 import java.time.LocalDate;
 import java.util.Scanner;
 public class EditTicket {
-    
+    // Finds a ticket, then loops showing an edit menu until the user is done
     public static void edit(Scanner scanner, TicketManager manager){
         
         Ticket ticket = findTicket(scanner, manager);
@@ -53,10 +45,10 @@ public class EditTicket {
         }
         
         System.out.println("Done editing ticket #"+ticket.getId()+"!");
-        System.out.println(ticket.toString());
+        DetailView.print(ticket);
     }
     
-    // Handles the enter and ID loop, will return null if the nuser backs out
+    // Prompts for a ticket ID until a valid one is found, or null if the user backs out
     private static Ticket findTicket(Scanner scanner, TicketManager manager){
         try{
             Ticket ticket = null;
@@ -84,6 +76,7 @@ public class EditTicket {
             return null;
         }
     }
+    // Edits the title, catching validation errors from the setter
     private static void editTitle(Scanner scanner, Ticket ticket){
         try {
             String title = InputHelper.readLine(scanner, "New title: ");
@@ -111,12 +104,13 @@ public class EditTicket {
         }
     }
     
+    // Edits status, blocking the change if dependencies aren't complete
     private static void editStatus(Scanner scanner, Ticket ticket, TicketManager manager){
         try {
             Status status = InputHelper.promptUntilValid(scanner,
                     "New status (To Do, In Progress, In Review, Done, Closed): ",
                     false,
-                    s -> Status.valueOf(s.toUpperCase()));
+                    Status::parse);
                 // Checks dependecies to see if it can be changed
                 if ((status == Status.IN_PROGRESS || status == Status.IN_REVIEW || status == Status.DONE)
                         && !manager.areDependenciesComplete(ticket)){
@@ -140,7 +134,7 @@ public class EditTicket {
             Priority priority = InputHelper.promptUntilValid(scanner,
                     "New priority (Low, Medium, High): ",
                     false,
-                    s -> Priority.valueOf(s.toUpperCase()));
+                    Priority::parse);
             ticket.setPriority(priority);
         } catch(InputHelper.BackException e){
             System.out.println("Priority edit cancelled.");
@@ -152,19 +146,20 @@ public class EditTicket {
             LocalDate duedate = InputHelper.promptUntilValid(scanner,
                     "New due date (dd/mm/yyyy): ",
                     false,
-                    LocalDate::parse);
+                    InputHelper::parseDate);
             ticket.setDuedate(duedate);
         } catch (InputHelper.BackException e){
             System.out.println("Due date edit canclled.");
         }
     }
     
+    // Adds or removes a single dependency based on user choice
     private static void editDependencies(Scanner scanner, Ticket ticket, TicketManager manager){
         try {
             System.out.println("Current dependencies: "+ticket.getDependencies());
             String action = InputHelper.readLine(scanner, "Add or remove a dependency? (add/remove): ").toLowerCase();
 
-            String idText = InputHelper.readLine(scanner, "Enter ticket ID t o add as a dependency");
+            String idText = InputHelper.readLine(scanner, "Enter ticket ID to add as a dependency: ");
             int depId;
             try {
                 depId = Integer.parseInt(idText);

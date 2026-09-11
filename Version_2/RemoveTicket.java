@@ -1,11 +1,12 @@
+//written with assistance from Claude.ai
 import java.util.Scanner;
 public class RemoveTicket {
-    // Remove Ticket
+    // Prompts for a ticket ID and removes it
     public static void removeTicket(Scanner scanner, TicketManager manager){
         try{ 
             int id;
             Ticket ticket = null;
-
+            // Loops until a existing  ticket ID is entered
             while(ticket == null){
                 String idText = InputHelper.readLine(scanner, "Enter the ID of ticket to remove: ");
                 try{
@@ -23,7 +24,8 @@ public class RemoveTicket {
                     System.out.println("No ticket found with the ID #"+id+". Please try again");
                 }
             }
-
+            
+            // Deletes the ticket and reports result
             boolean removed = manager.removeTicket(ticket.getId());
             if(removed){
                 System.out.println("Ticket #"+ticket.getId()+" has been successfully removed.");
