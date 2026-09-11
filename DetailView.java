@@ -36,7 +36,7 @@ public class DetailView extends AbstractTicketView {
         String label = formatLabel("Description");
         int indent = label.length();
         int contentWidth = ROW_WIDTH - indent;
-
+        //should print -N/A- if empty
         if (text == null || text.isBlank()) {
             System.out.println(label + "-N/A-");
             return;
@@ -66,7 +66,7 @@ public class DetailView extends AbstractTicketView {
             System.out.println(" ".repeat(indent) + content);
         }
     }
-    //formatting dependencies
+    //formatting dependencies to print -N/A- if empty
     private static String formatDependencies(List<Integer> deps) {
         if (deps == null || deps.isEmpty()) return "-N/A-";
         StringBuilder sb = new StringBuilder();
