@@ -14,6 +14,7 @@ public class MainView extends AbstractTicketView {
         printTable(filterActive(tickets), "Main View");
     }
 
+    // Archived tickets (DONE/CLOSED only)
     public static void printArchived(List<Ticket> tickets) {
         printTable(filterArchived(tickets), "Archived Tickets");
     }
