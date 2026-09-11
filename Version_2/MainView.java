@@ -1,38 +1,32 @@
+// Generated with assistance from Claude
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Prints the main ticket list view (CLI table).
- */
-public class MainView {
-    
+public class MainView extends AbstractTicketView {
+
     private static final String ROW_FORMAT = "%-8s%-30s%-14s%-11s%-10s%n";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
-    private static final int TITLE_CONTENT_WIDTH = 25; // max chars shown before "..."
-    private static final int ROW_WIDTH = 8 + 30 + 14 + 11 + 10; // keep in sync with ROW_FORMAT
-    
-    //truncate long titles to have "..." instead
-    private static String truncateTitle(String title) {
-        if (title.length() <= TITLE_CONTENT_WIDTH) {
-            return title;
-        }
-        // Leave room for the "..." within the content width
-        return title.substring(0, TITLE_CONTENT_WIDTH - 3) + "...";
-    }
-    
+    private static final int TITLE_CONTENT_WIDTH = 25;
+    // ROW_WIDTH is inherited from AbstractTicketView — its widths must stay in sync with ROW_FORMAT above
+
     public static void print(List<Ticket> tickets) {
+        printTable(filterActive(tickets), "Main View");
+    }
+
+    public static void printArchived(List<Ticket> tickets) {
+        printTable(filterArchived(tickets), "Archived Tickets");
+    }
+
+    private static void printTable(List<Ticket> tickets, String heading) {
+        System.out.println(centerText(heading, ROW_WIDTH));
         System.out.printf(ROW_FORMAT, "ID", "Name", "Status", "Priority", "Due Date");
         System.out.println("-".repeat(ROW_WIDTH));
-        
+
         for (Ticket t : tickets) {
-            // Don't show completed tickets in the main view
-            if (t.getStatus() == Status.DONE || t.getStatus() == Status.CLOSED) {
-                continue;
-            }
-            
             String id = String.format("%03d", t.getId());
             String due = (t.getDuedate() == null) ? "-N/A-" : t.getDuedate().format(DATE_FORMAT);
-            
+
             System.out.printf(ROW_FORMAT,
                     id,
                     truncateTitle(t.getTitle()),
@@ -40,24 +34,34 @@ public class MainView {
                     formatPriority(t.getPriority()),
                     due);
         }
-        
+
         System.out.println("-".repeat(ROW_WIDTH));
     }
-    
-    // Converts enum constants into the display style from the mockup
-    private static String formatStatus(Status status) {
-        switch (status) {
-            case TODO: return "To-Do";
-            case IN_PROGRESS: return "In Progress";
-            case IN_REVIEW: return "In Review";
-            case DONE: return "Done";
-            case CLOSED: return "Closed";
-            default: return status.toString();
+
+    private static List<Ticket> filterActive(List<Ticket> tickets) {
+        List<Ticket> result = new ArrayList<>();
+        for (Ticket t : tickets) {
+            if (t.getStatus() != Status.DONE && t.getStatus() != Status.CLOSED) {
+                result.add(t);
+            }
         }
+        return result;
     }
-    
-    private static String formatPriority(Priority priority) {
-        String s = priority.toString();
-        return s.charAt(0) + s.substring(1).toLowerCase();
+
+    private static List<Ticket> filterArchived(List<Ticket> tickets) {
+        List<Ticket> result = new ArrayList<>();
+        for (Ticket t : tickets) {
+            if (t.getStatus() == Status.DONE || t.getStatus() == Status.CLOSED) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    private static String truncateTitle(String title) {
+        if (title.length() <= TITLE_CONTENT_WIDTH) {
+            return title;
+        }
+        return title.substring(0, TITLE_CONTENT_WIDTH - 3) + "...";
     }
 }
