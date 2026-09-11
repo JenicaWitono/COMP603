@@ -20,7 +20,7 @@ public class ConsoleInput {
     
     // Loads saved tickets, then loops reading and dispatching commands until exit
     public void run(){
-        System.out.println("Ticket manager. Type 'help' to see commands.");
+        System.out.println("Welcome to Ticket Manager, home to all your tasks!\nUse '/new' to create a new ticket, or '/view' to view all your tickets.\nOtherwise, type '/help' to see all commands.");
         FileStorage.load(SAVE_FILE, manager);
         
         while(running){
