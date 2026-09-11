@@ -1,20 +1,19 @@
+// Generated with assistance from Claude
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainView {
-    
+public class MainView extends AbstractTicketView {
+
     private static final String ROW_FORMAT = "%-8s%-30s%-14s%-11s%-10s%n";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
     private static final int TITLE_CONTENT_WIDTH = 25;
-    private static final int ROW_WIDTH = 8 + 30 + 14 + 11 + 10;
+    // ROW_WIDTH is inherited from AbstractTicketView — its widths must stay in sync with ROW_FORMAT above
 
-    // Active tickets (excludes DONE/CLOSED) — your original main view
     public static void print(List<Ticket> tickets) {
         printTable(filterActive(tickets), "Main View");
     }
 
-    // Archived tickets (DONE/CLOSED only)
     public static void printArchived(List<Ticket> tickets) {
         printTable(filterArchived(tickets), "Archived Tickets");
     }
@@ -59,34 +58,10 @@ public class MainView {
         return result;
     }
 
-    private static String centerText(String text, int width) {
-        int totalPadding = width - text.length();
-        if (totalPadding <= 0) return text;
-        int left = totalPadding / 2;
-        int right = totalPadding - left;
-        return " ".repeat(left) + text + " ".repeat(right);
-    }
-
     private static String truncateTitle(String title) {
         if (title.length() <= TITLE_CONTENT_WIDTH) {
             return title;
         }
         return title.substring(0, TITLE_CONTENT_WIDTH - 3) + "...";
-    }
-
-    private static String formatStatus(Status status) {
-        switch (status) {
-            case TODO: return "To-Do";
-            case IN_PROGRESS: return "In Progress";
-            case IN_REVIEW: return "In Review";
-            case DONE: return "Done";
-            case CLOSED: return "Closed";
-            default: return status.toString();
-        }
-    }
-
-    private static String formatPriority(Priority priority) {
-        String s = priority.toString();
-        return s.charAt(0) + s.substring(1).toLowerCase();
     }
 }

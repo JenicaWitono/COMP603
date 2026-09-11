@@ -138,7 +138,7 @@ public class ConsoleInput {
                              /edit                                     - Edit an already existing ticket
                              /reset                                    - Clear the current save file and remove all tickets
                            The system saves upon quitting.
-                           Type 'exit' any time to quit, 'back' to cancel the current action.    
+                           Type '/exit' any time to quit, '/back' or '/cancel' to cancel the current action.    
                            """);
     }
    
