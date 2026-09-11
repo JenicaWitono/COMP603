@@ -98,7 +98,7 @@ public class FileStorage {
             }
         }
     }
-
+    // Tries to recover ID of corrupted ticket
     private static int extractId(Map<String, String> fields) {
         try {
             return Integer.parseInt(fields.get("ID"));
