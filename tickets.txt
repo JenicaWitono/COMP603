@@ -1,0 +1,99 @@
+ID:1
+Title:Alpha system sync
+Description:This task ensures the alpha module stays synchronized with upstream changes and avoids regression issues during deployment.
+Assignee:mira
+Status:TODO
+Priority:HIGH
+DueDate:2027-01-14
+LastModified:2026-09-11
+Dependencies:
+
+ID:2
+Title:Beta cleanup routine
+Description:Perform a full cleanup of deprecated beta routines to reduce clutter, improve maintainability, and prevent accidental reuse.
+Assignee:
+Status:IN_PROGRESS
+Priority:LOW
+DueDate:
+LastModified:2026-09-11
+Dependencies:3
+
+ID:3
+Title:Gamma UI refresh
+Description:Update the gamma interface with new styling guidelines, ensuring consistency, accessibility, and improved user flow.
+Assignee:leo
+Status:IN_REVIEW
+Priority:MEDIUM
+DueDate:2026-11-30
+LastModified:2026-09-11
+Dependencies:
+
+ID:4
+Title:Delta logging patch
+Description:Implement enhanced logging for delta operations to capture edge‑case failures and provide clearer diagnostic information.
+Assignee:
+Status:DONE
+Priority:HIGH
+DueDate:
+LastModified:2026-09-11
+Dependencies:1
+
+ID:5
+Title:Epsilon data audit
+Description:Conduct a thorough audit of epsilon data sources to identify inconsistencies, missing fields, and outdated references.
+Assignee:sam
+Status:TODO
+Priority:MEDIUM
+DueDate:2027-03-02
+LastModified:2026-09-11
+Dependencies:
+
+ID:6
+Title:Zeta performance tuning
+Description:Optimize zeta module performance by profiling bottlenecks, adjusting caching strategies, and refining heavy computation paths.
+Assignee:
+Status:IN_PROGRESS
+Priority:HIGH
+DueDate:2026-12-01
+LastModified:2026-09-11
+Dependencies:5
+
+ID:7
+Title:Eta migration prep
+Description:Prepare eta service for migration by validating schemas, updating configuration files, and ensuring compatibility with new APIs.
+Assignee:ava
+Status:TODO
+Priority:LOW
+DueDate:
+LastModified:2026-09-11
+Dependencies:
+
+ID:8
+Title:Theta error mapping
+Description:Map all theta‑related error codes to standardized formats, improving clarity for debugging and automated alerting systems.
+Assignee:
+Status:IN_REVIEW
+Priority:MEDIUM
+DueDate:2027-05-19
+LastModified:2026-09-11
+Dependencies:6
+
+ID:9
+Title:Iota security sweep
+Description:Perform a comprehensive security sweep of iota endpoints, checking for vulnerabilities, outdated libraries, and unsafe patterns.
+Assignee:r
+Status:DONE
+Priority:HIGH
+DueDate:
+LastModified:2026-09-11
+Dependencies:
+ 
+ID:10
+Title:Kappa release notes
+Description:Draft detailed release notes for the kappa update, summarizing new features, resolved issues, and known limitations.
+Assignee:
+Status:CLOSED
+Priority:LOW
+DueDate:2026-10-22
+LastModified:2026-09-11
+Dependencies:
