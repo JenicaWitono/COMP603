@@ -1,0 +1,17 @@
+Version 2 
+-- changes:
+Created set methods for all but dependecies, variables for ticket objects
+Added a TicketInput class that handles all user input
+Changed the Main class to accomodate the new TicketIput class
+Create a toString() method in the ticket class to allow a print of everything in a ticket 
+
+Version 3
+-- changes:
+Addes the mainview class
+changed main method to accommodate the new ConsoleInput class which handles all commands :)
+updated ticket manager to accommodate mainview class
+
+Version 4
+-- changes:
+Added the remove and edit(modify) methods, had to create new new class 'EditTicket' and made some changes to cConsoleInput to accomodate these changes
+awesome chungus
