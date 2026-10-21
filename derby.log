@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Fri Oct 02 16:21:38 NZDT 2026:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-01a0-faa1-bb74-00001f3023b8 
+on database directory C:\Users\jenic\Documents\NetBeansProjects\TicketManagement\ticketdb with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5c647e05 
+Loaded from file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=25.0.2+10-LTS-69
+user.dir=C:\Users\jenic\Documents\NetBeansProjects\TicketManagement
+os.name=Windows 11
+os.arch=amd64
+os.version=10.0
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

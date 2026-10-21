@@ -61,10 +61,7 @@ public class EditTicket {
                     System.out.println("That is not a valid ID number. Please try again.");
                     continue;
                 }
-                if (manager.isCorrupted(id)) {
-                    System.out.println("Ticket #" + id + " is corrupted and cannot be edited.");
-                    return null;
-                }
+
                 ticket = manager.getTicket(id);
                 if (ticket == null){
                     System.out.println("No ticket found with #"+id+". Please try again.");
@@ -88,17 +85,12 @@ public class EditTicket {
         }
     }
     
-    private static void editDescription(Scanner scanner, Ticket ticket){
-        try{
-            ticket.setDescription(InputHelper.readLine(scanner, "New description: "));
-        } catch (InputHelper.BackException e){
-            System.out.println("Description edit cancelled.");
-        }
-    }
-    
+    //edit assignee, blocks if it's invalid
     private static void editAssigne(Scanner scanner, Ticket ticket){
         try{
             ticket.setAssignee(InputHelper.readLine(scanner, "New assignee: "));
+        } catch (IllegalArgumentException e){
+            System.out.println(e.getMessage());
         } catch (InputHelper.BackException e){
             System.out.println("Assignee edit cancelled.");
         }
@@ -190,6 +182,16 @@ public class EditTicket {
             System.out.println(e.getMessage());
         } catch (InputHelper.BackException e){
             System.out.println("Dependency edit cancelled.");
+        }
+    }
+    //catches error for invalid description
+    private static void editDescription(Scanner scanner, Ticket ticket){
+        try{
+            ticket.setDescription(InputHelper.readLine(scanner, "New description: "));
+        } catch (IllegalArgumentException e){
+            System.out.println(e.getMessage());
+        } catch (InputHelper.BackException e){
+            System.out.println("Description edit cancelled.");
         }
     }
 }

@@ -8,6 +8,7 @@ public class RemoveTicket {
             Ticket ticket = null;
             // Loops until a existing  ticket ID is entered
             while(ticket == null){
+                
                 String idText = InputHelper.readLine(scanner, "Enter the ID of ticket to remove: ");
                 try{
                     id = Integer.parseInt(idText);
@@ -15,10 +16,7 @@ public class RemoveTicket {
                     System.out.println(idText+" is not a valid ticket ID.");
                     continue;
                 }
-                if (manager.isCorrupted(id)) {
-                    System.out.println("Ticket #" + id + " is corrupted and cannot be removed this way — it was never fully loaded.");
-                    return;
-                }
+                
                 ticket = manager.getTicket(id);
                 if (ticket == null){
                     System.out.println("No ticket found with the ID #"+id+". Please try again");
