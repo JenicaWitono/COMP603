@@ -4,16 +4,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
 
 // Holds and manages all tickets in memory
 public class TicketManager {
     //hashmap to store data
     private Map<Integer, Ticket> tickets = new HashMap<>();
-    //for corruptedIDs that failed to load will be treated as inaccessible
-    private Set<Integer> corruptedIds = new HashSet<>();
-
+    
     //assigning id's to new tickets
     private int nextID = 1;
     // creates and stores a new ticket. Auto assigns id based on nextID
@@ -48,7 +44,14 @@ public class TicketManager {
     
     // Removes a ticket by ID and will return whether or not it existed
     public boolean removeTicket(int id){
-        return tickets.remove(id) != null;
+        boolean removed = tickets.remove(id) != null;
+        if (removed) {
+            // clean up any other ticket that depended on this one
+            for (Ticket t : tickets.values()) {
+                t.getDependencies().remove(Integer.valueOf(id));
+            }
+        }
+        return removed;
     }
     
     // Inserts a ticket during load, preserving its saved ID, and keeps nextID ahead of it
@@ -70,16 +73,4 @@ public class TicketManager {
         return tickets.get(id);
     }
 
-    // Marks an ID as unusable due to a load failure, and keeps nextID ahead of it
-    public void markCorrupted(int id){
-        corruptedIds.add(id);
-        if (id >= nextID) {
-            nextID = id + 1;
-        }
-    }
-    
-    //checks if the ticket is corrupted (by ID).
-    public boolean isCorrupted(int id){
-        return corruptedIds.contains(id);
-    }
 }

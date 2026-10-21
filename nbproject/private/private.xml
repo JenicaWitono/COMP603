@@ -2,21 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/AbstractTicketView.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/ConsoleInput.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/DetailView.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/EditTicket.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/FileStorage.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/InputHelper.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/Main.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/MainView.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/Priority.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/RemoveTicket.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/Status.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/Ticket.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/TicketInput.java</file>
-            <file>file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/src/TicketManager.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

@@ -9,7 +9,12 @@ import java.time.LocalDate;
 
 public class TicketStorage {
 
-    private static final String DB_URL = "jdbc:derby:ticketdb;create=true";
+    private static String dbUrl = "jdbc:derby:ticketdb;create=true";
+
+    // Lets tests point the storage at a throwaway database instead of the real one
+    static void useDatabase(String name) {
+        dbUrl = "jdbc:derby:" + name + ";create=true";
+    }    
     
     //runs once, forces Java to run Derby driver
     static {
@@ -22,7 +27,7 @@ public class TicketStorage {
     
     //opening a connection to the database
     private static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL);
+        return DriverManager.getConnection(dbUrl);
     }
     
     //create tables

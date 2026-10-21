@@ -9,7 +9,6 @@ public class ConsoleInput {
     private final Scanner scanner;
     private final TicketManager manager;
     private boolean running;
-    private static final String SAVE_FILE = "tickets.txt";
     
     // Constructor
     public ConsoleInput(Scanner scanner, TicketManager manager){
@@ -21,7 +20,12 @@ public class ConsoleInput {
     // Loads saved tickets, then loops reading and dispatching commands until exit
     public void run(){
         System.out.println("Welcome to Ticket Manager, home to all your tasks!\nUse '/new' to create a new ticket, or '/view' to view all your tickets.\nOtherwise, type '/help' to see all commands.");
-        FileStorage.load(SAVE_FILE, manager);
+        //if there is an error in starting database
+        if (!TicketStorage.initialize()) {
+            System.out.println("Exiting — the program cannot run without a working database.");
+            return;
+        }
+        TicketStorage.load(manager);
         
         while(running){
             try{
@@ -31,19 +35,17 @@ public class ConsoleInput {
                     continue;
                 }
           
-                dispatch(line);
+                dispatch(line);                
             } catch (InputHelper.ExitException e){
-                // Save on exit
                 System.out.println("File saved. Goodbye!");
-                FileStorage.save(SAVE_FILE, manager);
+                TicketStorage.save(manager);
+                TicketStorage.shutdown();
                 running = false;
             } catch (InputHelper.BackException e){
                 // Nothing to go back to from the main menu
                 System.out.println("You are at the main menu. Cannot go back anyfuther!");
             }
         }
-        
-        
     }
     
     // Figuring out what command was typed
@@ -130,10 +132,6 @@ public class ConsoleInput {
                 return;
             }
 
-            if (manager.isCorrupted(id)) {
-                System.out.println("Ticket #" + id + " is corrupted and cannot be accessed.");
-                return;
-            }
             Ticket ticket = manager.getTicket(id);
             if (ticket == null) {
                 System.out.println("No ticket found with ID " + id + ".");

@@ -12,16 +12,30 @@ public class TicketInput {
         String title = InputHelper.promptUntilValid(scanner, "Enter ticket title: ", false, TicketInput::validateTitle);
         ticket = manager.createTicket(title);
         
-        // Description input optional for user
-        String description = InputHelper.readLine(scanner, "Enter a Description of the ticket (optional): ");
-        if(!description.trim().isEmpty()){ // If the description is empty will skip instead of overrighting
-            ticket.setDescription(description);
+        // Description input optional for user, loops if it's too long
+        while (true) {
+            String description = InputHelper.readLine(scanner, "Enter a Description of the ticket (optional): ");
+            try {
+                if (!description.trim().isEmpty()) {
+                    ticket.setDescription(description);
+                }
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
         }
         
-        // Assignee input optional for user
-        String assignee = InputHelper.readLine(scanner, "Enter an Assignee (optional): ");
-        if(!assignee.trim().isEmpty()){ // If the description is empty will skip instead of overrighting
-            ticket.setAssignee(assignee);
+        // Assignee input optional for user, loops if it's too long
+        while (true) {
+            String assignee = InputHelper.readLine(scanner, "Enter an Assignee (optional): ");
+            try {
+                if (!assignee.trim().isEmpty()){
+                    ticket.setAssignee(assignee);
+                }
+                break;
+            } catch (IllegalArgumentException e){
+                System.out.println(e.getMessage());
+            }
         }
         
         // Status input optional as will defualt to TODO if no answer
@@ -89,8 +103,8 @@ public class TicketInput {
         if (input == null || input.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be empty.");
         }
-        if (input.split("\\s+").length > 50) {
-            throw new IllegalArgumentException("Title limit is 50 words.");
+        if (input.length() > 500) {
+            throw new IllegalArgumentException("Title limit is 500 characters.");
         }
         return input;
     }

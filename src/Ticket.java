@@ -78,16 +78,16 @@ public class Ticket {
        }
        return dependencies;
    }
-    
+
     // title setter with a validatoin
     public void setTitle(String title) {
         //exception for empty titles
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be empty.");
         }
-        //word limit exception (50)
-        if (title.split("\\s+").length > 50) {
-            throw new IllegalArgumentException("Title limit is 50 words.");
+        //character limit exception (500)
+        if (title.length() > 500) {
+            throw new IllegalArgumentException("Title cannot exceed 500 characters.");
         }
         this.title = title;
         updateLastModified();
@@ -95,12 +95,19 @@ public class Ticket {
 
     // Description set method
     public void setDescription(String description){
+        if (description != null && description.length() > 2000) {
+            throw new IllegalArgumentException("Description cannot exceed 2000 characters.");
+        }
         this.description = description;
         updateLastModified();
     }
     
     // Assigne set method
     public void setAssignee(String assignee){
+        //check if the length is too long
+        if (assignee != null && assignee.length() > 100) {
+            throw new IllegalArgumentException("Assignee cannot exceed 100 characters.");
+        }
         this.assignee = assignee;
         updateLastModified();
     }
