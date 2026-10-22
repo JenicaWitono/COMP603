@@ -1,6 +1,6 @@
-This project already contains dummy data in tickets.txt
+This project already contains dummy data
 
-If you wish to start fresh, please delete tickets.txt and test the program as normal!
-Thank you and we hope you enjoy our program!!
+If you wish to start fresh, please use the reset button in the main view to wipe out all the tickets.
+Have fun!
 
 -group 21
