@@ -20,6 +20,7 @@ public class MainViewGUI extends JFrame {
     private final TicketManager manager;
     private final DefaultTableModel model;
     private final JTable table;
+    private boolean showArchived = false;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
     
     // Window Constructor
@@ -43,10 +44,12 @@ public class MainViewGUI extends JFrame {
         // Top Bar: Help and Save buttons, and the title
         JButton helpButton = new JButton("Help");
         JButton saveExitButton = new JButton("Save & Exit");
+        JButton resetButton = new JButton("Reset");
         
         JPanel buttonRow = new JPanel();
         buttonRow.add(helpButton);
         buttonRow.add(saveExitButton);
+        buttonRow.add(resetButton);
         
         JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
         appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD,18f));
@@ -66,6 +69,10 @@ public class MainViewGUI extends JFrame {
         JButton newTaskButton = new JButton("New Task");
         JPanel newTaskRow = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
         newTaskRow.add(newTaskButton);
+      
+        // Archive View button
+        JButton archiveButton = new JButton("Archive");
+        newTaskRow.add(archiveButton);
         
         // Stacking the three pieces vertically in the header
         JPanel header = new JPanel();
@@ -102,11 +109,18 @@ public class MainViewGUI extends JFrame {
         // Fill the table from the manager
         refresh();
         
-        // Actions: Help / New Task/ Detatil view (placehodlers for now)
-        helpButton.addActionListener(e -> placeholder("Help screen"));
+        // Actions: Help / New Task/ Detatil view/ Archive view Toggle
+        helpButton.addActionListener(e -> help());
         saveExitButton.addActionListener(e -> saveAndExit());
         newTaskButton.addActionListener(e -> openNewTask());
-        
+        archiveButton.addActionListener(e -> {
+            showArchived = !showArchived;
+            archiveButton.setText(showArchived ? "Active Tickets" : "Archive");
+            pageTitle.setText(showArchived ? "Archived Tickets" : "Main View");
+            newTaskButton.setEnabled(!showArchived); // new tickets start active, so hide the option while archived
+            refresh();
+        });
+        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager));
         // Clicking on a r ow to open detail view (placeholder for now)
         table.addMouseListener(new MouseAdapter(){
             @Override
@@ -123,13 +137,14 @@ public class MainViewGUI extends JFrame {
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
     
-    // Rebuilds the t able rows from the manager.
+    // Rebuilds the table rows from the manager.
     // Call after any change to the data
     public void refresh(){
         model.setRowCount(0);
         for (Ticket t : manager.getAllTickets()){
-            // Skip archived tickets
-            if (t.getStatus() == Status.DONE || t.getStatus() == Status.CLOSED) continue;
+            
+            boolean archived = t.getStatus() == Status.DONE || t.getStatus() == Status.CLOSED;
+            if (archived != showArchived) continue; // wrong list for the current mode
            // One value per column
             model.addRow(new Object[]{
                 String.format("%03d", t.getId()),
@@ -162,9 +177,20 @@ public class MainViewGUI extends JFrame {
         new NewTaskGUI(manager, this).setVisible(true);
     }
     
-    // Stand in for screens that don't exist yet
-    private void placeholder(String what){
-        JOptionPane.showMessageDialog(this, what + " - not built yet.");
+    // help screen
+    private void help(){
+        String text = """
+                      MAIN VIEW
+                      
+                      This page lists your active tickets (anything that is not Done or Closed).
+                      Click a row to open that tickewt's detail view.
+                      
+                      Buttons:
+                        New Task - Create a new ticket.
+                        Archive/Active Tickets - Toggles between active and archived tickets.
+                        Save & Exit - Saves all tickets to the database and closes the program.
+                      """;
+        JOptionPane.showMessageDialog(this, text, "Help - Main View", JOptionPane.INFORMATION_MESSAGE);
     }
     
     // Status Display

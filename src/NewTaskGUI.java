@@ -69,10 +69,12 @@ public class NewTaskGUI extends JFrame {
         // Top Bar: Help and Save buttons, and the title
         JButton helpButton = new JButton("Help");
         JButton saveExitButton = new JButton("Save & Exit");
+        JButton resetButton = new JButton("Reset");
         
         JPanel buttonRow = new JPanel();
         buttonRow.add(helpButton);
         buttonRow.add(saveExitButton);
+        buttonRow.add(resetButton);
         
         JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
         appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD,18f));
@@ -126,11 +128,12 @@ public class NewTaskGUI extends JFrame {
         bottom.add(confrimButton);
         
         // Actions
-        helpButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "not built yet"));
+        helpButton.addActionListener(e -> help());
         saveExitButton.addActionListener(e -> saveAndExit());
         cancelButton.addActionListener(e -> goBack());
         confrimButton.addActionListener(e-> confrim());
         getRootPane().setDefaultButton(confrimButton); // enter = Confrim
+        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager, this::goBack));
         
         add(header, BorderLayout.NORTH);
         add(form, BorderLayout.CENTER);
@@ -250,6 +253,22 @@ public class NewTaskGUI extends JFrame {
         TicketStorage.save(manager);
         goBack();
     }
+    
+    // help screen
+    private void help(){
+        String text = """
+                      NEW TASK
+                      
+                      Fill in the form and press confrim to create a new ticket.
+                      Only Name is required to create a ticket. Status defaults to TO-DO, and Priority to Medium
+                      
+                      Buttons:
+                        Confrim - Creates the ticket and returns you to the main view.
+                        Cancel - Returns to main view without creating anything.
+                        Save & Exit - Saves exisiting tickets and closes the program
+                      """;
+        JOptionPane.showMessageDialog(this, text, "Help - New Task", JOptionPane.INFORMATION_MESSAGE);
+    }
         
         // Close this window and go to the previous
         private void goBack(){
@@ -264,6 +283,7 @@ public class NewTaskGUI extends JFrame {
             TicketStorage.shutdown();
             System.exit(0);
         }
+        
         
         private void error(String message) {
         JOptionPane.showMessageDialog(this, message, "Can't create ticket", JOptionPane.WARNING_MESSAGE);
