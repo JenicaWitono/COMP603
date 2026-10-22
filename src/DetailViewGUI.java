@@ -108,7 +108,7 @@ public class DetailViewGUI extends JFrame{
         helpButton.addActionListener(e -> placeholder("Help screen"));
         saveExitButton.addActionListener(e -> saveAndExit());
         backButton.addActionListener(e -> goBack());
-        editButton.addActionListener(e -> placeholder("Edit screen"));
+        editButton.addActionListener(e -> openEdit());
         
         add(header, BorderLayout.NORTH);
         add(form, BorderLayout.CENTER);
@@ -171,6 +171,11 @@ public class DetailViewGUI extends JFrame{
         return sb.toString().trim();
     }
     
+   // Hides this window then opens the edit screen for this ticket
+   private void openEdit(){
+       setVisible(false);
+       new EditTicketGUI(manager, mainView, this, ticket).setVisible(true);
+   }
     
     // Closes this window and returns to the main view
     private void goBack(){
