@@ -54,7 +54,7 @@ public class EditTicketGUI extends JFrame{
     // Inputs shown while a field is being edited
     private final JTextField nameEditor = new JTextField();
     private final JComboBox<String> statusEditor = new JComboBox<>(statusLables());
-    private final JComboBox<String> priorityEditor = new JComboBox<>(statusLables());
+    private final JComboBox<String> priorityEditor = new JComboBox<>(priorityLables());
     private final JTextField dueEditor = new JTextField();
     private final JTextArea descEditor = new JTextArea(4, 20);
     private final JTextField depsEditor = new JTextField();
@@ -93,10 +93,13 @@ public class EditTicketGUI extends JFrame{
         // Top bar (same as the other screens)
         JButton helpButton = new JButton("Help");
         JButton saveExitButton = new JButton("Save & Exit");
+        JButton resetButton = new JButton("Reset");
  
         JPanel buttonRow = new JPanel();
         buttonRow.add(helpButton);
         buttonRow.add(saveExitButton);
+        buttonRow.add(resetButton);
+        
  
         JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
         appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD, 18f));
@@ -202,10 +205,11 @@ public class EditTicketGUI extends JFrame{
         bottom.add(confirmButton);
         
         // Actions
-        helpButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "Help screen - not built yet."));
+        helpButton.addActionListener(e -> help());
         saveExitButton.addActionListener(e -> saveAndExit());
         cancelButton.addActionListener(e -> cancel());
         confirmButton.addActionListener(e -> confrimAll());
+        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager, this::backToMain));
  
         add(header, BorderLayout.NORTH);
         add(formHolder, BorderLayout.CENTER);
@@ -218,7 +222,7 @@ public class EditTicketGUI extends JFrame{
         final String label;
         final boolean tall; // text area rows keep their buttons at the top
         final JButton editBtn = new JButton("Edit");
-        final JButton confirmBtn = new JButton("confirm);");
+        final JButton confirmBtn = new JButton("confirm");
         final JPanel valuePanel = new JPanel(new BorderLayout()); // swaps between the value and the input
         final JTextComponent viewText; // read only display of the current value
         final JComponent viewComp; // viewtext or a scroll panel around it
@@ -493,6 +497,34 @@ public class EditTicketGUI extends JFrame{
     private void cancel() {
         detailView.setVisible(true);
         dispose();
+    }
+    
+    // After a reset: close this page and the hidden detail page, and show the main view
+    private void backToMain() {
+        detailView.dispose();
+        dispose();
+        mainView.refresh();
+        mainView.setVisible(true);
+    }
+
+    
+    // Help screen
+    private void help(){
+        String text = """
+                      Edit Ticket 
+                      
+                      This page allows you to edit already exisiting  tickets
+                      to edit a ticket you press the edit button next to the field you would like to change 
+                      then you press confrim beside it.
+                      to complete the changes to the ticket you must press confrim at the bottom of the page 
+                      this will save the changes to the database
+                      
+                      Buttons:
+                        Confirm (bottom)  - Save your changes and return to the detail view.
+                        Cancel - Discard your changes and return.
+                        Save & Exit - Save existing tickets and close the program.
+                      """;
+        JOptionPane.showMessageDialog(this, text, "Help - Edit Ticket", JOptionPane.INFORMATION_MESSAGE);
     }
     
     // Save the tickets already in the manager and quits

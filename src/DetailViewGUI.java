@@ -53,10 +53,12 @@ public class DetailViewGUI extends JFrame{
         // Top Bar: Help and Save buttons, and the title
         JButton helpButton = new JButton("Help");
         JButton saveExitButton = new JButton("Save & Exit");
+        JButton resetButton = new JButton("Reset");
         
         JPanel buttonRow = new JPanel();
         buttonRow.add(helpButton);
         buttonRow.add(saveExitButton);
+        buttonRow.add(resetButton);
         
         JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
         appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD,18f));
@@ -105,10 +107,11 @@ public class DetailViewGUI extends JFrame{
         bottom.add(editButton);
         
         // Actions
-        helpButton.addActionListener(e -> placeholder("Help screen"));
+        helpButton.addActionListener(e -> help());
         saveExitButton.addActionListener(e -> saveAndExit());
         backButton.addActionListener(e -> goBack());
         editButton.addActionListener(e -> openEdit());
+        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager, this::goBack));
         
         add(header, BorderLayout.NORTH);
         add(form, BorderLayout.CENTER);
@@ -191,9 +194,18 @@ public class DetailViewGUI extends JFrame{
         System.exit(0);
     }
     
-    // Placeholdeers
-    private void placeholder(String what){
-        JOptionPane.showMessageDialog(this, what + "not built yet");
+    // Help screen
+    private void help() {
+        String text = """
+                DETAIL VIEW
+
+                Shows all the details of one ticket.
+
+                Back         - Return to the list.
+                Edit         - Change this ticket.
+                Save & Exit  - Save all tickets and close the program.
+                """;
+        JOptionPane.showMessageDialog(this, text, "Help - Detail View", JOptionPane.INFORMATION_MESSAGE);
     }
     
     // Status display label
