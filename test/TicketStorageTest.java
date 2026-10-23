@@ -1,5 +1,6 @@
 //written with assistance from Claude.ai
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -119,5 +120,34 @@ public class TicketStorageTest {
 
         Assert.assertEquals(1, loaded.getAllTickets().size());
         Assert.assertNull(loaded.getTicket(2));
+    }
+
+    @Test
+    public void loadKeepsLastModifiedTest() {
+        // a ticket last changed in 2020, with a dependency so loadDependencies runs too
+        TicketManager saved = new TicketManager();
+        saved.createTicket("One");
+        Ticket old = new Ticket(2, "Old", null, null, Status.TODO, null, LocalDate.of(2020, 1, 1), Priority.LOW);
+        old.setDependencies(List.of(1));
+        saved.addLoadedTicket(old);
+        TicketStorage.save(saved);
+
+        TicketManager loaded = new TicketManager();
+        TicketStorage.load(loaded);
+        LocalDate actual = loaded.getTicket(2).getLastModified();
+        Assert.assertEquals(LocalDate.of(2020, 1, 1), actual);
+    }
+
+    @Test
+    public void nextIdAfterLoadTest() {
+        TicketManager saved = new TicketManager();
+        saved.createTicket("One");
+        saved.createTicket("Two");
+        TicketStorage.save(saved);
+
+        TicketManager loaded = new TicketManager();
+        TicketStorage.load(loaded);
+        int actual = loaded.createTicket("Three").getId();
+        Assert.assertEquals(3, actual);
     }
 }

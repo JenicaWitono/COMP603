@@ -83,7 +83,7 @@ public class TicketManagerTest {
         main.addDependency(dependency.getId());
         dependency.setStatus(Status.IN_PROGRESS);
 
-        boolean actual = manager.areDependenciesComplete(main);
+        boolean actual = manager.incompleteDependencyText(main.getDependencies()).isEmpty();
         Assert.assertFalse(actual);
     }
 
@@ -94,7 +94,40 @@ public class TicketManagerTest {
         main.addDependency(dependency.getId());
         dependency.setStatus(Status.DONE);
 
-        boolean actual = manager.areDependenciesComplete(main);
+        boolean actual = manager.incompleteDependencyText(main.getDependencies()).isEmpty();
+        Assert.assertTrue(actual);
+    }
+
+    // parsing the dependencies input
+
+    @Test
+    public void parseDependenciesTest() {
+        manager.createTicket("One");
+        manager.createTicket("Two");
+        List<Integer> actual = manager.parseDependencies(" 1, 2 ", 0);
+        Assert.assertEquals(List.of(1, 2), actual);
+    }
+
+    @Test
+    public void parseDependenciesUnknownIdTest() {
+        try {
+            manager.parseDependencies("42", 0);
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            //ticket 42 doesn't exist
+        }
+    }
+
+    // dependency loops
+
+    @Test
+    public void directLoopDetectedTest() {
+        Ticket one = manager.createTicket("One");
+        Ticket two = manager.createTicket("Two");
+        two.addDependency(one.getId());
+
+        // one -> two would make one -> two -> one
+        boolean actual = manager.wouldCreateCycle(one.getId(), List.of(two.getId()));
         Assert.assertTrue(actual);
     }
 
