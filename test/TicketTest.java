@@ -59,6 +59,16 @@ public class TicketTest {
         }
     }
 
+    @Test
+    public void tooManyWordsTitleRejectedTest() {
+        try {
+            ticket.setTitle("word ".repeat(51));
+            Assert.fail("Expected IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            //titles are max 50 words
+        }
+    }
+
     // description and assignee limits
 
     @Test
