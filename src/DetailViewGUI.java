@@ -12,73 +12,25 @@ import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 // Detail view of a ticket, opened from the main view by clicking on a ticket's row
 // shows every field of one ticket, black / closing the window returns to the main view
-public class DetailViewGUI extends JFrame{
+public class DetailViewGUI extends TicketWindow{
     
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
-    private final TicketManager manager;
+   
     private final MainViewGUI mainView;
     private final Ticket ticket;
     
     public DetailViewGUI(TicketManager manager, MainViewGUI mainView, Ticket ticket){
-        this.manager = manager;
+        super(manager, "Detail View", 700, 500);
         this.mainView = mainView;
         this.ticket = ticket;
-        
-        // Window setup
-        setTitle("TicketManager");
-        setSize(700,500);
-        setLocationRelativeTo(null);
-        
-        // Closing the windows acts like back
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter(){
-            @Override
-            public void windowClosing(WindowEvent e){
-                goBack();
-            }
-        });
-        
-        // Top Bar: Help and Save buttons, and the title
-        JButton helpButton = new JButton("Help");
-        JButton saveExitButton = new JButton("Save & Exit");
-        JButton resetButton = new JButton("Reset");
-        
-        JPanel buttonRow = new JPanel();
-        buttonRow.add(helpButton);
-        buttonRow.add(saveExitButton);
-        buttonRow.add(resetButton);
-        
-        JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
-        appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD,18f));
-        
-        JPanel topBar = new JPanel(new BorderLayout());
-        topBar.add(buttonRow, BorderLayout.WEST);
-        topBar.add(appTitle, BorderLayout.CENTER);
-        topBar.setBorder(BorderFactory.createMatteBorder(0,0,2,0, java.awt.Color.BLACK));
-        
-        //Page Title
-        JLabel pageTitle = new JLabel("Main View");
-        pageTitle.setFont(pageTitle.getFont().deriveFont(Font.PLAIN, 24f));
-        pageTitle.setBorder(new EmptyBorder(5, 10, 5, 0));
-        pageTitle.setAlignmentX(LEFT_ALIGNMENT);
-        topBar.setAlignmentX(LEFT_ALIGNMENT);
-        
-        JPanel header = new JPanel();
-        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
-        header.add(topBar);
-        header.add(pageTitle);
         
         // Form
         String due = ticket.getDuedate() == null ? "-" : ticket.getDuedate().format(DATE_FORMAT);
@@ -88,8 +40,8 @@ public class DetailViewGUI extends JFrame{
         form.setBorder(new EmptyBorder(5,20,5,20));
         addRow(form, 0, "ID", readOnlyField(String.format("%03d", ticket.getId())), false);
         addRow(form, 1, "Name", readOnlyField(ticket.getTitle()), false);
-        addRow(form, 2, "Status", readOnlyField(formatStatus(ticket.getStatus())), false);
-        addRow(form, 3, "Priority", readOnlyField(formatPriority(ticket.getPriority())), false);
+        addRow(form, 2, "Status", readOnlyField((ticket.getStatus().getLabel())), false);
+        addRow(form, 3, "Priority", readOnlyField((ticket.getPriority().getLabel())), false);
         addRow(form, 4, "Due-Date", readOnlyField(due), false);
         addRow(form, 5, "Description", readOnlyArea(desc, 3), true);
         addRow(form, 6, "Dependencies", readOnlyArea(dependencyText(), 3), true);
@@ -107,13 +59,9 @@ public class DetailViewGUI extends JFrame{
         bottom.add(editButton);
         
         // Actions
-        helpButton.addActionListener(e -> help());
-        saveExitButton.addActionListener(e -> saveAndExit());
         backButton.addActionListener(e -> goBack());
         editButton.addActionListener(e -> openEdit());
-        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager, this::goBack));
         
-        add(header, BorderLayout.NORTH);
         add(form, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
     }
@@ -165,7 +113,7 @@ public class DetailViewGUI extends JFrame{
             sb.append("#").append(String.format("%03d", depId));
             Ticket dep = manager.getTicket(depId);
             if (dep != null){
-                sb.append(" - ").append(dep.getTitle()).append(" (").append(formatStatus(dep.getStatus())).append(")");
+                sb.append(" - ").append(dep.getTitle()).append(" (").append(dep.getStatus().getLabel()).append(")");
             } else {
                 sb.append(" (missing)");
             }
@@ -187,16 +135,23 @@ public class DetailViewGUI extends JFrame{
         mainView.setVisible(true);
     }
     
-    // Saves everything in the manager and quits
-    private void saveAndExit(){
-        TicketStorage.save(manager);
-        TicketStorage.shutdown();
-        System.exit(0);
+    // X button acts like Back
+    @Override
+    protected void onWindowClosing(){
+        goBack();
     }
     
+    // After a reset the ticket no longer exists so go back to main view
+    @Override
+    protected void afterReset(){
+        goBack();
+    }
+
+    
     // Help screen
-    private void help() {
-        String text = """
+    @Override
+    protected String helpText() {
+        return """
                 DETAIL VIEW
 
                 Shows all the details of one ticket.
@@ -205,23 +160,5 @@ public class DetailViewGUI extends JFrame{
                 Edit         - Change this ticket.
                 Save & Exit  - Save all tickets and close the program.
                 """;
-        JOptionPane.showMessageDialog(this, text, "Help - Detail View", JOptionPane.INFORMATION_MESSAGE);
-    }
-    
-    // Status display label
-    private static String formatStatus(Status s) {
-        return switch (s) {
-            case TODO -> "To-Do";
-            case IN_PROGRESS -> "In Progress";
-            case IN_REVIEW -> "In Review";
-            case DONE -> "Done";
-            case CLOSED -> "Closed";
-        };
-    }
-    
-    // Priority display lbel
-    private static String formatPriority(Priority p){
-        String s = p.toString();
-        return s.charAt(0) + s.substring(1).toLowerCase();
     }
 }

@@ -14,13 +14,10 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -33,11 +30,10 @@ import java.util.function.Supplier;
 // each field will have an edit button pressing the button turns the field into an input
 // will show a confrim button next to it, when a field is bening edited all other edit buttons will disspear
 // 
-public class EditTicketGUI extends JFrame{
+public class EditTicketGUI extends TicketWindow{
     
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
-    private final TicketManager manager;
+   
     private final MainViewGUI mainView;
     private final DetailViewGUI detailView;
     private final Ticket ticket;
@@ -63,7 +59,7 @@ public class EditTicketGUI extends JFrame{
     private FieldRow active = null; // the row is currently being edited
     
     public EditTicketGUI(TicketManager manager, MainViewGUI mainView, DetailViewGUI detailView, Ticket ticket){
-        this.manager = manager;
+        super(manager, "Edit Ticket", 700, 500);
         this.mainView = mainView;
         this.detailView = detailView;
         this. ticket = ticket;
@@ -75,52 +71,7 @@ public class EditTicketGUI extends JFrame{
         editedPriority = ticket.getPriority();
         editedDue = ticket.getDuedate();
         editedDeps = new ArrayList<>(ticket.getDependencies());
-        
-        // Window setup
-        setTitle("TicketManager");
-        setSize(700, 500);
-        setLocationRelativeTo(null);
-        
-        // Closing the window
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter(){
-            @Override
-            public void windowClosing(WindowEvent e){
-                cancel();
-            }
-        });
-        
-        // Top bar (same as the other screens)
-        JButton helpButton = new JButton("Help");
-        JButton saveExitButton = new JButton("Save & Exit");
-        JButton resetButton = new JButton("Reset");
- 
-        JPanel buttonRow = new JPanel();
-        buttonRow.add(helpButton);
-        buttonRow.add(saveExitButton);
-        buttonRow.add(resetButton);
-        
- 
-        JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
-        appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD, 18f));
- 
-        JPanel topBar = new JPanel(new BorderLayout());
-        topBar.add(buttonRow, BorderLayout.WEST);
-        topBar.add(appTitle, BorderLayout.CENTER);
-        topBar.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, java.awt.Color.BLACK));
-    
-        // Page title
-        JLabel pageTitle = new JLabel("Edit ticket");
-        pageTitle.setFont(pageTitle.getFont().deriveFont(Font.PLAIN, 24f));
-        pageTitle.setBorder(new EmptyBorder(5,10,5,0));
-        pageTitle.setAlignmentX(LEFT_ALIGNMENT);
-        topBar.setAlignmentX(LEFT_ALIGNMENT);
-        
-        JPanel header = new JPanel();
-        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
-        header.add(topBar);
-        header.add(pageTitle);
-        
+
         // Input setup
         descEditor.setLineWrap(true);
         descEditor.setWrapStyleWord(true);
@@ -142,12 +93,12 @@ public class EditTicketGUI extends JFrame{
                 this::editedName));
         
         rows.add(new FieldRow("Status", false, readOnlyField(), statusEditor,
-        () -> formatStatus(editedStatus),
+        () -> editedStatus.getLabel(),
         () -> statusEditor.setSelectedIndex(editedStatus.ordinal()),
                 this::editedStatus));
         
         rows.add(new FieldRow("Priority", false, readOnlyField(), priorityEditor,
-        () -> formatPriority(editedPriority),
+        () -> editedPriority.getLabel(),
         () -> priorityEditor.setSelectedIndex(editedPriority.ordinal()),
                 this::editedPriority));
         
@@ -194,9 +145,9 @@ public class EditTicketGUI extends JFrame{
         JPanel formHolder = new JPanel(new BorderLayout());
         formHolder.add(form, BorderLayout.NORTH);
         
-        // Cancel / Confrim
+        // Cancel / Confirm
         JButton cancelButton = new JButton ("Cancel");
-        JButton confirmButton = new JButton ("Confrim");
+        JButton confirmButton = new JButton ("Confirm");
         cancelButton.setPreferredSize(new Dimension(110, 28));
         confirmButton.setPreferredSize(new Dimension(110, 28));
         
@@ -205,13 +156,9 @@ public class EditTicketGUI extends JFrame{
         bottom.add(confirmButton);
         
         // Actions
-        helpButton.addActionListener(e -> help());
-        saveExitButton.addActionListener(e -> saveAndExit());
         cancelButton.addActionListener(e -> cancel());
         confirmButton.addActionListener(e -> confrimAll());
-        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager, this::backToMain));
- 
-        add(header, BorderLayout.NORTH);
+
         add(formHolder, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
         }
@@ -360,7 +307,7 @@ public class EditTicketGUI extends JFrame{
         if (newStatus == Status.IN_PROGRESS || newStatus == Status.IN_REVIEW || newStatus == Status.DONE) {
             String incomplete = incompleteDependencies();
             if (!incomplete.isEmpty()) {
-                error("Cannot move this ticket to " + formatStatus(newStatus)
+                error("Cannot move this ticket to " +  newStatus.getLabel()
                         + " - it has incomplete dependencies:" + incomplete);
                 return false;
             }
@@ -456,7 +403,7 @@ public class EditTicketGUI extends JFrame{
             sb.append("#").append(String.format("%03d", depId));
             Ticket dep = manager.getTicket(depId);
             if(dep != null){
-                sb.append(" - ").append(dep.getTitle()).append(" (").append(formatStatus(dep.getStatus())).append(")");
+                sb.append(" - ").append(dep.getTitle()).append(" (").append((dep.getStatus().getLabel())).append(")");
             } else{
                 sb.append(" (missing)");
             }
@@ -500,17 +447,23 @@ public class EditTicketGUI extends JFrame{
     }
     
     // After a reset: close this page and the hidden detail page, and show the main view
-    private void backToMain() {
+    protected void afterReset() {
         detailView.dispose();
         dispose();
         mainView.refresh();
         mainView.setVisible(true);
     }
+    
+    //
+    @Override protected void onWindowClosing(){
+        cancel();
+    }
 
     
     // Help screen
-    private void help(){
-        String text = """
+    @Override
+    protected String helpText(){
+        return """
                       Edit Ticket 
                       
                       This page allows you to edit already exisiting  tickets
@@ -524,15 +477,8 @@ public class EditTicketGUI extends JFrame{
                         Cancel - Discard your changes and return.
                         Save & Exit - Save existing tickets and close the program.
                       """;
-        JOptionPane.showMessageDialog(this, text, "Help - Edit Ticket", JOptionPane.INFORMATION_MESSAGE);
     }
-    
-    // Save the tickets already in the manager and quits
-    private void saveAndExit(){
-        TicketStorage.save(manager);
-        TicketStorage.shutdown();
-        System.exit(0);
-    }
+
     
     private void error(String message){
         JOptionPane.showMessageDialog(this, message, "Can't save change", JOptionPane.WARNING_MESSAGE);
@@ -557,7 +503,7 @@ public class EditTicketGUI extends JFrame{
     private static String[] statusLables(){
         String[] labels = new String[Status.values().length];
         for (Status s : Status.values()){
-            labels[s.ordinal()] = formatStatus(s);
+            labels[s.ordinal()] = s.getLabel();
         }
         return labels;
     }
@@ -565,23 +511,8 @@ public class EditTicketGUI extends JFrame{
     private static String[] priorityLables(){
         String[] labels = new String[Priority.values().length];
         for (Priority p : Priority.values()){
-            labels[p.ordinal()] = formatPriority(p);
+            labels[p.ordinal()] = p.getLabel();
         }
         return labels;
     }
-    private static String formatStatus(Status s) {
-        return switch (s) {
-            case TODO -> "To-Do";
-            case IN_PROGRESS -> "In Progress";
-            case IN_REVIEW -> "In Review";
-            case DONE -> "Done";
-            case CLOSED -> "Closed";
-        };
-    }
- 
-    private static String formatPriority(Priority p) {
-        String s = p.toString();
-        return s.charAt(0) + s.substring(1).toLowerCase();
-    }
-    
 }
