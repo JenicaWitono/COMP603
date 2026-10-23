@@ -13,13 +13,10 @@ import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -27,9 +24,8 @@ import java.util.List;
 
 // New Task screen. will be opened from the main view, with cancel or confrim closing the window
 // all return to main menu that will refesh and show the new created ticket
-public class NewTaskGUI extends JFrame {
-    
-    private final TicketManager manager;
+public class NewTaskGUI extends TicketWindow {
+   
     private final MainViewGUI mainView;
     
     // Text inputs
@@ -50,51 +46,11 @@ public class NewTaskGUI extends JFrame {
     private final JToggleButton highBtn = new JToggleButton("High");
     
     public NewTaskGUI(TicketManager manager, MainViewGUI mainView) {
-        this.manager = manager;
+        super(manager, "New Task", 700, 500);
         this.mainView = mainView;
         
-        // Window setup
-        setTitle("TicketManager");
-        setSize(700,480);
-        setLocationRelativeTo(null);
+        header.centerPageTitle(); // title sits in the middle of the window
         
-        // Closing the window acts like cancel (goes back to main view)
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter(){
-            @Override
-            public void windowClosing(WindowEvent e){
-                goBack();
-            }
-        });
-        
-        // Top Bar: Help and Save buttons, and the title
-        JButton helpButton = new JButton("Help");
-        JButton saveExitButton = new JButton("Save & Exit");
-        JButton resetButton = new JButton("Reset");
-        
-        JPanel buttonRow = new JPanel();
-        buttonRow.add(helpButton);
-        buttonRow.add(saveExitButton);
-        buttonRow.add(resetButton);
-        
-        JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
-        appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD,18f));
-        
-        JPanel topBar = new JPanel(new BorderLayout());
-        topBar.add(buttonRow, BorderLayout.WEST);
-        topBar.add(appTitle, BorderLayout.CENTER);
-        topBar.setBorder(BorderFactory.createMatteBorder(0,0,2,0, java.awt.Color.BLACK));
-        
-        // Page Title
-        JLabel pageTitle = new JLabel("New Task");
-        pageTitle.setFont(pageTitle.getFont().deriveFont(Font.PLAIN, 24f));
-        pageTitle.setAlignmentX(CENTER_ALIGNMENT);
-        topBar.setAlignmentX(CENTER_ALIGNMENT); // both centred so the title sits in the middle of the window
-        
-        JPanel header = new JPanel();
-        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
-        header.add(topBar);
-        header.add(pageTitle);
         
         // Only one status / priority can be picked at a time
         ButtonGroup statusGroup = new ButtonGroup();
@@ -131,20 +87,13 @@ public class NewTaskGUI extends JFrame {
         bottom.add(confrimButton);
         
         // Actions
-        helpButton.addActionListener(e -> help());
-        saveExitButton.addActionListener(e -> saveAndExit());
         cancelButton.addActionListener(e -> goBack());
         confrimButton.addActionListener(e-> confrim());
         getRootPane().setDefaultButton(confrimButton); // enter = Confrim
-        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager, this::goBack));
-        
-        add(header, BorderLayout.NORTH);
+
         add(form, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
     }
-        
-        
-        
         
     // Adds one "label : input" row to the form
     private void addRow(JPanel form, int row, String label, JComponent input, boolean stretch){
@@ -280,9 +229,22 @@ public class NewTaskGUI extends JFrame {
         goBack();
     }
     
+    // X button acts like Cancel
+    @Override
+    protected void onWindowClosing(){
+        goBack();
+    }
+    
+    // reset
+    @Override
+    protected void afterReset(){
+        goBack();
+    }
+    
     // help screen
-    private void help(){
-        String text = """
+    @Override
+    protected String helpText(){
+        return """
                       NEW TASK
                       
                       Fill in the form and press confrim to create a new ticket.
@@ -293,7 +255,6 @@ public class NewTaskGUI extends JFrame {
                         Cancel - Returns to main view without creating anything.
                         Save & Exit - Saves exisiting tickets and closes the program
                       """;
-        JOptionPane.showMessageDialog(this, text, "Help - New Task", JOptionPane.INFORMATION_MESSAGE);
     }
         
         // Close this window and go to the previous
@@ -302,15 +263,7 @@ public class NewTaskGUI extends JFrame {
             mainView.refresh();
             mainView.setVisible(true);
         }
-        
-        // Save everytthing already in manager and quits
-        private void saveAndExit(){
-            TicketStorage.save(manager);
-            TicketStorage.shutdown();
-            System.exit(0);
-        }
-        
-        
+  
         private void error(String message) {
         JOptionPane.showMessageDialog(this, message, "Can't create ticket", JOptionPane.WARNING_MESSAGE);
     }
