@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Fri Oct 23 17:12:48 NZDT 2026:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-01a1-66f6-1f27-00001f302f90 
+Fri Oct 23 18:12:48 NZDT 2026:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-01a1-672d-0ea6-00001f2fb258 
 on database directory C:\Users\jenic\Documents\NetBeansProjects\TicketManagement\ticketdb with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5c647e05 
 Loaded from file:/C:/Users/jenic/Documents/NetBeansProjects/TicketManagement/lib/derby.jar
 java.vendor=Oracle Corporation
@@ -11,9 +11,3 @@ os.arch=amd64
 os.version=10.0
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
-----------------------------------------------------------------
-Fri Oct 23 17:12:52 NZDT 2026: Shutting down Derby engine
-----------------------------------------------------------------
-Fri Oct 23 17:12:52 NZDT 2026:
-Shutting down instance a816c00e-01a1-66f6-1f27-00001f302f90 on database directory C:\Users\jenic\Documents\NetBeansProjects\TicketManagement\ticketdb with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5c647e05 
-----------------------------------------------------------------
