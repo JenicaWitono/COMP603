@@ -11,7 +11,7 @@ public class TicketManagerTest {
     // Runs before each test case: gives every test an empty manager
     @Before
     public void setUp() {
-        manager = new TicketManager();
+        manager = new TicketManager(new DerbyTicketDAO("ticketdb_test")); // these tests never save, so the database is never opened
     }
 
     // creating and finding tickets

@@ -1,4 +1,10 @@
 public enum Priority {
     LOW, MEDIUM, HIGH;
-    //removed the parsing because the GUI is a dropdown and not input
+    
+    // Text shown in GUI
+    public String getLabel(){
+        String s = name();
+        return s.charAt(0) + s.substring(1).toLowerCase();
+    }   
+    
 }

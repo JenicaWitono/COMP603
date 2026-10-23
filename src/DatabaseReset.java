@@ -8,11 +8,6 @@ public class DatabaseReset {
         // Static helper class
     }
 
-    // For the main view: asks first, resets, then refreshes the main view's table.
-    public static boolean confirmAndReset(MainViewGUI mainView, TicketManager manager) {
-        return confirmAndReset(mainView, manager, mainView::refresh);
-    }
-
     // Shows a confirmation popup, then resets and runs afterReset
     public static boolean confirmAndReset(Component parent, TicketManager manager, Runnable afterReset){
         int count = manager.getAllTickets().size();
@@ -41,6 +36,6 @@ public class DatabaseReset {
     // Clears every ticket and saves the empty list, returns false if the save failed
     public static boolean reset(TicketManager manager){
         manager.reset();
-        return TicketStorage.save(manager);
+        return manager.save();
     }
 }

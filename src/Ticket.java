@@ -151,7 +151,7 @@ public class Ticket {
         updateLastModified();
     }
 
-    // Replaces the whole dependency list (used by the edit screen and TicketStorage when loading)
+    // Replaces the whole dependency list (used by the edit screen and DerbyTicketDAO when loading)
     // doesn't change last modified, so loading keeps the saved date
     public void setDependencies(List<Integer> dependencies){
         this.dependencies = (dependencies != null) ? new ArrayList<>(dependencies) : new ArrayList<>();

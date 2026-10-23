@@ -7,22 +7,48 @@ import java.util.Map;
 
 // Holds and manages all tickets in memory
 public class TicketManager {
+    // Where the tickets are saved to and loaded from (the database)
+    private final TicketDAO dao;
+
     //hashmap to store data
     private Map<Integer, Ticket> tickets = new HashMap<>();
 
     //assigning IDs to new tickets
     private int nextID = 1;
+
+    // The manager is given its DAO, so it doesn't need to know which database is used
+    public TicketManager(TicketDAO dao){
+        this.dao = dao;
+    }
+
+    // Writes every ticket to the database, returns false if it failed
+    public boolean save(){
+        return dao.saveAll(getAllTickets());
+    }
+
+    // Puts every saved ticket into the manager, returns false if loading failed
+    public boolean load(){
+        List<Ticket> loaded = dao.loadAll();
+        if (loaded == null){
+            return false;
+        }
+        for (Ticket t : loaded){
+            addLoadedTicket(t);
+        }
+        return true;
+    }
+
+    // Closes the database when the program ends
+    public void closeDatabase(){
+        dao.shutdown();
+    }
+
     // creates and stores a new ticket. Auto assigns id based on nextID
     public Ticket createTicket(String title) {
         Ticket t = new Ticket(nextID, title);
         tickets.put(nextID, t);
         nextID++;
         return t;
-    }
-
-    // In Progress, In Review and Done all need every dependency finished first
-    public static boolean needsCompleteDependencies(Status s){
-        return s == Status.IN_PROGRESS || s == Status.IN_REVIEW || s == Status.DONE;
     }
 
     // Turns text like "2, 5" into a list of IDs, checking each one exists
@@ -58,7 +84,7 @@ public class TicketManager {
         StringBuilder sb = new StringBuilder();
         for (int depId : deps){
             Ticket dep = tickets.get(depId);
-            if (dep != null && dep.getStatus() != Status.DONE && dep.getStatus() != Status.CLOSED){
+            if (dep != null && !dep.getStatus().isFinished()){
                 sb.append("\n #").append(Formats.formatId(dep.getId())).append(" - ").append(dep.getTitle());
             }
         }
@@ -74,7 +100,7 @@ public class TicketManager {
             sb.append("#").append(Formats.formatId(depId));
             Ticket dep = tickets.get(depId);
             if (dep != null){
-                sb.append(" - ").append(dep.getTitle()).append(" (").append(Formats.formatStatus(dep.getStatus())).append(")");
+                sb.append(" - ").append(dep.getTitle()).append(" (").append(dep.getStatus().getLabel()).append(")");
             } else {
                 sb.append(" (missing)");
             }

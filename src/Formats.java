@@ -46,22 +46,4 @@ public class Formats {
         }
         throw new DateTimeParseException("Unrecognised date format: " + input, input, 0);
     }
-
-    // Status display label
-    public static String formatStatus(Status s) {
-        return switch (s) {
-            case TODO -> "To-Do";
-            case IN_PROGRESS -> "In Progress";
-            case IN_REVIEW -> "In Review";
-            case DONE -> "Done";
-            case CLOSED -> "Closed";
-        };
-    }
-
-    // Converts Priority into a display label, by making the first letter a capital and the rest lowercase
-    public static String formatPriority(Priority p) {
-        String s = p.toString();
-        return s.charAt(0) + s.substring(1).toLowerCase();
-    }
 }
-

@@ -5,86 +5,33 @@ import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 // Detail view of a ticket, opened from the main view by clicking on a ticket's row
 // shows every field of one ticket, back / closing the window returns to the main view
-public class DetailViewGUI extends JFrame{
+public class DetailViewGUI extends TicketWindow{
 
-    private final TicketManager manager;
     private final MainViewGUI mainView;
     private final Ticket ticket;
 
     public DetailViewGUI(TicketManager manager, MainViewGUI mainView, Ticket ticket){
-        this.manager = manager;
+        super(manager, "Detail View", 700, 560);
         this.mainView = mainView;
         this.ticket = ticket;
 
-        // Window setup
-        setTitle("TicketManager");
-        setSize(700,560);
-        setLocationRelativeTo(null);
-
-        // Closing the window acts like back
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter(){
-            @Override
-            public void windowClosing(WindowEvent e){
-                goBack();
-            }
-        });
-
-        // Top Bar: Help and Save buttons, and the title
-        JButton helpButton = new JButton("Help");
-        JButton saveExitButton = new JButton("Save & Exit");
-        JButton resetButton = new JButton("Reset");
-
-        JPanel buttonRow = new JPanel();
-        buttonRow.add(helpButton);
-        buttonRow.add(saveExitButton);
-        buttonRow.add(resetButton);
-
-        JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
-        appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD,18f));
-
-        JPanel topBar = new JPanel(new BorderLayout());
-        topBar.add(buttonRow, BorderLayout.WEST);
-        topBar.add(appTitle, BorderLayout.CENTER);
-        topBar.setBorder(BorderFactory.createMatteBorder(0,0,2,0, java.awt.Color.BLACK));
-
-        //Page Title
-        JLabel pageTitle = new JLabel("Detailed View");
-        pageTitle.setFont(pageTitle.getFont().deriveFont(Font.PLAIN, 24f));
-        pageTitle.setBorder(new EmptyBorder(5, 10, 5, 0));
-
         // Delete button sits on the right of the page title, away from Back / Edit
         JButton deleteButton = new JButton("Delete");
-        JPanel deleteHolder = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
-        deleteHolder.add(deleteButton);
-
-        JPanel titleRow = new JPanel(new BorderLayout());
-        titleRow.add(pageTitle, BorderLayout.WEST);
-        titleRow.add(deleteHolder, BorderLayout.EAST);
-        titleRow.setAlignmentX(LEFT_ALIGNMENT);
-        topBar.setAlignmentX(LEFT_ALIGNMENT);
-
-        JPanel header = new JPanel();
-        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
-        header.add(topBar);
-        header.add(titleRow);
+        header.addTitleButton(deleteButton);
 
         // Form
         JPanel form = new JPanel(new GridBagLayout());
         form.setBorder(new EmptyBorder(5,20,5,20));
         addRow(form, 0, "ID", readOnlyField(Formats.formatId(ticket.getId())), false);
         addRow(form, 1, "Name", readOnlyField(ticket.getTitle()), false);
-        addRow(form, 2, "Status", readOnlyField(Formats.formatStatus(ticket.getStatus())), false);
-        addRow(form, 3, "Priority", readOnlyField(Formats.formatPriority(ticket.getPriority())), false);
+        addRow(form, 2, "Status", readOnlyField(ticket.getStatus().getLabel()), false);
+        addRow(form, 3, "Priority", readOnlyField(ticket.getPriority().getLabel()), false);
         addRow(form, 4, "Assignee", readOnlyField(Formats.textOrDash(ticket.getAssignee())), false);
         addRow(form, 5, "Due-Date", readOnlyField(Formats.formatDate(ticket.getDuedate())), false);
         addRow(form, 6, "Description", readOnlyArea(Formats.textOrDash(ticket.getDescription()), 3), true);
@@ -103,14 +50,10 @@ public class DetailViewGUI extends JFrame{
         bottom.add(editButton);
 
         // Actions
-        helpButton.addActionListener(e -> help());
-        saveExitButton.addActionListener(e -> saveAndExit());
         backButton.addActionListener(e -> goBack());
         editButton.addActionListener(e -> openEdit());
         deleteButton.addActionListener(e -> confirmDelete());
-        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager, this::goBack));
 
-        add(header, BorderLayout.NORTH);
         add(form, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
     }
@@ -175,7 +118,7 @@ public class DetailViewGUI extends JFrame{
         }
 
         manager.removeTicket(ticket.getId());
-        if (!TicketStorage.save(manager)){
+        if (!manager.save()){
             JOptionPane.showMessageDialog(this, "The ticket was deleted, but the database could not be updated.",
                     "Save failed", JOptionPane.ERROR_MESSAGE);
         }
@@ -189,21 +132,22 @@ public class DetailViewGUI extends JFrame{
         mainView.setVisible(true);
     }
 
-    // Saves everything in the manager and quits
-    // if the save fails it asks before quitting so nothing is lost by accident
-    private void saveAndExit(){
-        if (!TicketStorage.save(manager)) {
-            boolean exitAnyway = ConfirmDialog.ask(this, "Save failed",
-                    "Tickets could not be saved to the database.\nExit without saving?", "Exit anyway");
-            if (!exitAnyway) return;
-        }
-        TicketStorage.shutdown();
-        System.exit(0);
+    // X button acts like Back
+    @Override
+    protected void onWindowClosing(){
+        goBack();
+    }
+
+    // After a reset the ticket no longer exists so go back to main view
+    @Override
+    protected void afterReset(){
+        goBack();
     }
 
     // Help screen
-    private void help() {
-        String text = """
+    @Override
+    protected String helpText() {
+        return """
                 DETAIL VIEW
 
                 Shows all the details of one ticket.
@@ -214,6 +158,5 @@ public class DetailViewGUI extends JFrame{
                 Save & Exit  - Save all tickets and close the program.
                 Reset        - Delete every ticket and start fresh (asks first).
                 """;
-        JOptionPane.showMessageDialog(this, text, "Help - Detail View", JOptionPane.INFORMATION_MESSAGE);
     }
 }

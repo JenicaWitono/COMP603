@@ -4,22 +4,18 @@ import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
 // New Task screen. will be opened from the main view, with cancel or confirm closing the window
 // both return to the main view, which will refresh and show the newly created ticket
-public class NewTaskGUI extends JFrame {
+public class NewTaskGUI extends TicketWindow {
 
-    private final TicketManager manager;
     private final MainViewGUI mainView;
 
     // Text inputs
@@ -40,51 +36,10 @@ public class NewTaskGUI extends JFrame {
     private final JToggleButton highBtn = new JToggleButton("High");
 
     public NewTaskGUI(TicketManager manager, MainViewGUI mainView) {
-        this.manager = manager;
+        super(manager, "New Task", 700, 500);
         this.mainView = mainView;
 
-        // Window setup
-        setTitle("TicketManager");
-        setSize(700,480);
-        setLocationRelativeTo(null);
-
-        // Closing the window acts like cancel (goes back to main view)
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter(){
-            @Override
-            public void windowClosing(WindowEvent e){
-                goBack();
-            }
-        });
-
-        // Top Bar: Help and Save buttons, and the title
-        JButton helpButton = new JButton("Help");
-        JButton saveExitButton = new JButton("Save & Exit");
-        JButton resetButton = new JButton("Reset");
-
-        JPanel buttonRow = new JPanel();
-        buttonRow.add(helpButton);
-        buttonRow.add(saveExitButton);
-        buttonRow.add(resetButton);
-
-        JLabel appTitle = new JLabel("Ticket Manager", SwingConstants.CENTER);
-        appTitle.setFont(appTitle.getFont().deriveFont(Font.BOLD,18f));
-
-        JPanel topBar = new JPanel(new BorderLayout());
-        topBar.add(buttonRow, BorderLayout.WEST);
-        topBar.add(appTitle, BorderLayout.CENTER);
-        topBar.setBorder(BorderFactory.createMatteBorder(0,0,2,0, java.awt.Color.BLACK));
-
-        // Page Title
-        JLabel pageTitle = new JLabel("New Task");
-        pageTitle.setFont(pageTitle.getFont().deriveFont(Font.PLAIN, 24f));
-        pageTitle.setAlignmentX(CENTER_ALIGNMENT);
-        topBar.setAlignmentX(CENTER_ALIGNMENT); // both centred so the title sits in the middle of the window
-
-        JPanel header = new JPanel();
-        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
-        header.add(topBar);
-        header.add(pageTitle);
+        header.centerPageTitle(); // title sits in the middle of the window
 
         // Only one status / priority can be picked at a time
         ButtonGroup statusGroup = new ButtonGroup();
@@ -121,14 +76,10 @@ public class NewTaskGUI extends JFrame {
         bottom.add(confirmButton);
 
         // Actions
-        helpButton.addActionListener(e -> help());
-        saveExitButton.addActionListener(e -> saveAndExit());
         cancelButton.addActionListener(e -> goBack());
         confirmButton.addActionListener(e-> confirm());
         getRootPane().setDefaultButton(confirmButton); // enter = Confirm
-        resetButton.addActionListener(e -> DatabaseReset.confirmAndReset(this, manager, this::goBack));
 
-        add(header, BorderLayout.NORTH);
         add(form, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
     }
@@ -213,10 +164,10 @@ public class NewTaskGUI extends JFrame {
 
         // Can't start or finish a ticket if its dependencies aren't Done or Closed
         Status status = selectedStatus();
-        if (TicketManager.needsCompleteDependencies(status)) {
+        if (status.needsCompleteDependencies()) {
             String incomplete = manager.incompleteDependencyText(deps);
             if (!incomplete.isEmpty()) {
-                error("Cannot create this ticket as " + Formats.formatStatus(status)
+                error("Cannot create this ticket as " + status.getLabel()
                         + " - it has incomplete dependencies:" + incomplete);
                 return;
             }
@@ -231,16 +182,40 @@ public class NewTaskGUI extends JFrame {
         if (due != null) t.setDuedate(due);
         for (int depId : deps) t.addDependency(depId);
 
-        if (!TicketStorage.save(manager)) {
+        if (!manager.save()) {
             JOptionPane.showMessageDialog(this, "The ticket was created, but could not be saved to the database.",
                     "Save failed", JOptionPane.ERROR_MESSAGE);
         }
         goBack();
     }
 
+    // Close this window and go to the previous
+    private void goBack(){
+        dispose();
+        mainView.refresh();
+        mainView.setVisible(true);
+    }
+
+    private void error(String message) {
+        JOptionPane.showMessageDialog(this, message, "Can't create ticket", JOptionPane.WARNING_MESSAGE);
+    }
+
+    // X button acts like Cancel
+    @Override
+    protected void onWindowClosing(){
+        goBack();
+    }
+
+    // reset
+    @Override
+    protected void afterReset(){
+        goBack();
+    }
+
     // help screen
-    private void help(){
-        String text = """
+    @Override
+    protected String helpText(){
+        return """
                       NEW TASK
 
                       Fill in the form and press Confirm to create a new ticket.
@@ -252,29 +227,5 @@ public class NewTaskGUI extends JFrame {
                         Save & Exit - Saves existing tickets and closes the program.
                         Reset - Deletes every ticket and starts fresh (asks first).
                       """;
-        JOptionPane.showMessageDialog(this, text, "Help - New Task", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    // Close this window and go to the previous
-    private void goBack(){
-        dispose();
-        mainView.refresh();
-        mainView.setVisible(true);
-    }
-
-    // Save everything already in manager and quits
-    // if the save fails it asks before quitting so nothing is lost by accident
-    private void saveAndExit(){
-        if (!TicketStorage.save(manager)) {
-            boolean exitAnyway = ConfirmDialog.ask(this, "Save failed",
-                    "Tickets could not be saved to the database.\nExit without saving?", "Exit anyway");
-            if (!exitAnyway) return;
-        }
-        TicketStorage.shutdown();
-        System.exit(0);
-    }
-
-    private void error(String message) {
-        JOptionPane.showMessageDialog(this, message, "Can't create ticket", JOptionPane.WARNING_MESSAGE);
     }
 }
